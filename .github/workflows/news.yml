@@ -3,7 +3,7 @@ name: International Development News
 on:
   workflow_dispatch:
   schedule:
-    # 매일 오전 8시 KST
+    # 매일 한국시간 오전 8시
     - cron: "0 23 * * *"
 
 permissions:
@@ -25,9 +25,7 @@ jobs:
       - name: 라이브러리 설치
         run: pip install -r requirements.txt
 
-      - name: 뉴스 수집 및 분석
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: 뉴스 수집 및 브리핑 생성
         run: python news.py
 
       - name: 변경된 파일 저장
@@ -41,6 +39,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "변경사항이 없습니다."
           else
-            git commit -m "Update analyzed development news"
+            git commit -m "Update daily development brief"
             git push
           fi
