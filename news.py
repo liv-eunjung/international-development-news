@@ -684,13 +684,13 @@ def render_category_sections(
 def render_country_section(
     articles: list[dict[str, object]],
 ) -> str:
-    country_counts = Counter()
+    country_articles = defaultdict(list)
 
     for article in articles:
         for country in article["countries"]:
-            country_counts[str(country)] += 1
+            country_articles[str(country)].append(article)
 
-    if not country_counts:
+    if not country_articles:
         return (
             '<p class="empty">'
             '확인된 국가명이 없습니다.'
@@ -699,22 +699,59 @@ def render_country_section(
 
     items = []
 
-    for country, count in country_counts.most_common(12):
+    sorted_countries = sorted(
+        country_articles.items(),
+        key=lambda item: len(item[1]),
+        reverse=True,
+    )
+
+    for country, related_articles in sorted_countries[:12]:
         flag = COUNTRY_FLAGS.get(country, "🌍")
+
+        article_links = []
+
+        for article in related_articles:
+            title = html.escape(str(article["title"]))
+            link = html.escape(
+                str(article["link"]),
+                quote=True,
+            )
+            source = html.escape(str(article["source"]))
+            category = html.escape(str(article["category"]))
+
+            article_links.append(
+                f"""
+                <li>
+                    <a
+                        href="{link}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {title}
+                    </a>
+                    <div class="country-article-meta">
+                        {source} · {category}
+                    </div>
+                </li>
+                """
+            )
 
         items.append(
             f"""
-            <div class="country-item">
-                <span>
-                    {flag} {html.escape(country)}
-                </span>
-                <strong>{count}건</strong>
-            </div>
+            <details class="country-item">
+                <summary>
+                    <span>{flag} {html.escape(country)}</span>
+                    <strong>{len(related_articles)}건</strong>
+                </summary>
+
+                <ul class="country-article-list">
+                    {''.join(article_links)}
+                </ul>
+            </details>
             """
         )
 
     return "\n".join(items)
-
 
 def render_keyword_section(
     articles: list[dict[str, object]],
@@ -937,20 +974,68 @@ def create_html(
             font-size: 13px;
         }}
 
-        .country-grid {{
-            display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(180px, 1fr));
-            gap: 10px;
-        }}
+.country-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
 
-        .country-item {{
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 12px;
-            background: #f7f8fa;
-            border: 1px solid #e0e3e7;
-        }}
+.country-item {
+    width: 100%;
+    background: #f7f8fa;
+    border: 1px solid #e0e3e7;
+}
+
+.country-item summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 15px;
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+}
+
+.country-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.country-item summary::after {
+    content: "＋";
+    margin-left: 12px;
+    color: #2457a6;
+}
+
+.country-item[open] summary::after {
+    content: "−";
+}
+
+.country-article-list {
+    margin: 0;
+    padding: 14px 22px 16px 42px;
+    background: #ffffff;
+    border-top: 1px solid #e0e3e7;
+}
+
+.country-article-list li {
+    margin-bottom: 13px;
+}
+
+.country-article-list a {
+    color: #1456a0;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.country-article-list a:hover {
+    text-decoration: underline;
+}
+
+.country-article-meta {
+    margin-top: 3px;
+    color: #777777;
+    font-size: 13px;
+}
 
         .keywords {{
             display: flex;
