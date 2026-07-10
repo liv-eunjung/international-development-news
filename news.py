@@ -836,11 +836,11 @@ def create_html(
             word-break: keep-all;
         }}
 
-    .container {
+    .container {{
     max-width: 1180px;
     margin: 0 auto;
     padding: 48px 24px 80px;
-}
+}}
 
         h1 {{
             margin: 0 0 6px;
@@ -889,7 +889,7 @@ def create_html(
             font-size: 19px;
         }}
 
-.news-summary {
+.news-summary {{
     width: 100%;
     max-width: 100%;
     margin-bottom: 24px;
@@ -897,9 +897,9 @@ def create_html(
     background: #fafafa;
     border: 1px solid #e0e3e7;
     overflow: visible;
-}
+}}
 
-.news-summary h4 {
+.news-summary h4 {{
     width: 100%;
     max-width: 100%;
     margin: 0 0 12px;
@@ -910,16 +910,16 @@ def create_html(
     text-overflow: unset;
     overflow-wrap: anywhere;
     word-break: break-word;
-}
+}}
 
-.news-summary ul {
+.news-summary ul {{
     width: 100%;
     max-width: 100%;
     margin: 0;
     padding-left: 22px;
-}
+}}
 
-.news-summary li {
+.news-summary li {{
     width: 100%;
     max-width: 100%;
     margin-bottom: 8px;
@@ -929,7 +929,7 @@ def create_html(
     text-overflow: unset;
     overflow-wrap: anywhere;
     word-break: break-word;
-}
+}}
 
         .summary-source {{
             margin-top: 12px;
