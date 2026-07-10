@@ -1,10 +1,14 @@
 import html
+import math
 import re
+import time
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from urllib.parse import quote
 
 import feedparser
+import requests
+import trafilatura
 
 
 KST = timezone(timedelta(hours=9))
@@ -18,11 +22,26 @@ SEARCH_KEYWORDS = [
     "해외봉사단",
     "인도적 지원",
     "OECD DAC 한국",
-    "국제개발협력 채용",
 ]
 
 MAX_ARTICLES_PER_KEYWORD = 5
-MAX_TOTAL_ARTICLES = 30
+MAX_TOTAL_ARTICLES = 24
+
+# 기사 한 건당 최대 본문 길이
+MAX_ARTICLE_TEXT_LENGTH = 10000
+
+# 분야별 표시할 기사 수
+MAX_ARTICLES_PER_SECTION = 6
+
+REQUEST_TIMEOUT = 15
+
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/131.0 Safari/537.36"
+    )
+}
 
 
 CATEGORY_RULES = {
@@ -50,7 +69,6 @@ CATEGORY_RULES = {
         "민간단체",
         "국제구호",
         "시민단체",
-        "사회적경제",
     ],
     "해외봉사": [
         "해외봉사",
@@ -158,7 +176,6 @@ KEYWORD_CANDIDATES = [
     "UNDP",
     "UNICEF",
     "SDGs",
-    "Climate",
     "기후변화",
     "해외봉사",
     "봉사단",
@@ -172,6 +189,41 @@ KEYWORD_CANDIDATES = [
     "청년",
     "난민",
 ]
+
+
+STOPWORDS = {
+    "기자",
+    "뉴스",
+    "관련",
+    "대한",
+    "통해",
+    "위해",
+    "이번",
+    "있는",
+    "있다",
+    "한다",
+    "했다",
+    "및",
+    "등",
+    "의",
+    "가",
+    "이",
+    "은",
+    "는",
+    "을",
+    "를",
+    "에",
+    "와",
+    "과",
+    "로",
+    "으로",
+    "에서",
+    "한",
+    "또한",
+    "것으로",
+    "밝혔다",
+    "예정이다",
+}
 
 
 def google_news_rss_url(keyword: str) -> str:
@@ -216,6 +268,10 @@ def collect_news() -> list[dict[str, str]]:
                 source_data.get("title", "출처 미확인")
             )
 
+            description = clean_text(
+                entry.get("summary", "")
+            )
+
             if not title or not link:
                 continue
 
@@ -229,6 +285,7 @@ def collect_news() -> list[dict[str, str]]:
                     "title": title,
                     "link": link,
                     "source": source,
+                    "description": description,
                     "search_keyword": keyword,
                     "published": clean_text(
                         entry.get("published", "")
@@ -248,15 +305,184 @@ def collect_news() -> list[dict[str, str]]:
     return articles
 
 
+def fetch_article_text(url: str) -> tuple[str, str]:
+    """
+    기사 URL에 접속해 최종 URL과 본문을 반환합니다.
+    본문 추출 실패 시 빈 문자열을 반환합니다.
+    """
+    try:
+        response = requests.get(
+            url,
+            headers=HEADERS,
+            timeout=REQUEST_TIMEOUT,
+            allow_redirects=True,
+        )
+        response.raise_for_status()
+
+        final_url = response.url
+
+        extracted = trafilatura.extract(
+            response.text,
+            include_comments=False,
+            include_tables=False,
+            no_fallback=False,
+            favor_precision=True,
+        )
+
+        if not extracted:
+            return final_url, ""
+
+        extracted = clean_text(extracted)
+
+        return (
+            final_url,
+            extracted[:MAX_ARTICLE_TEXT_LENGTH],
+        )
+
+    except Exception as error:
+        print(
+            f"본문 추출 실패: {url} "
+            f"({type(error).__name__})"
+        )
+        return url, ""
+
+
+def split_sentences(text: str) -> list[str]:
+    text = clean_text(text)
+
+    sentences = re.split(
+        r"(?<=[.!?。！？])\s+|(?<=다\.)\s+",
+        text,
+    )
+
+    result = []
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+
+        if len(sentence) < 25:
+            continue
+
+        if len(sentence) > 300:
+            sentence = sentence[:300].rstrip() + "…"
+
+        result.append(sentence)
+
+    return result
+
+
+def tokenize(text: str) -> list[str]:
+    words = re.findall(
+        r"[가-힣]{2,}|[A-Za-z]{3,}",
+        text.lower(),
+    )
+
+    return [
+        word
+        for word in words
+        if word not in STOPWORDS
+    ]
+
+
+def summarize_text(
+    title: str,
+    text: str,
+    fallback: str,
+    sentence_count: int = 3,
+) -> list[str]:
+    """
+    단어 출현 빈도를 기반으로 핵심 문장을 선별합니다.
+    AI 생성 요약이 아니라 기사 본문 문장 중 중요 문장을 추출합니다.
+    """
+    source_text = text or fallback
+
+    sentences = split_sentences(source_text)
+
+    if not sentences:
+        return [title]
+
+    all_words = tokenize(
+        f"{title} {source_text}"
+    )
+
+    if not all_words:
+        return sentences[:sentence_count]
+
+    frequencies = Counter(all_words)
+    max_frequency = max(frequencies.values())
+
+    normalized_frequencies = {
+        word: count / max_frequency
+        for word, count in frequencies.items()
+    }
+
+    title_words = set(tokenize(title))
+
+    scored_sentences = []
+
+    for index, sentence in enumerate(sentences):
+        words = tokenize(sentence)
+
+        if not words:
+            continue
+
+        frequency_score = sum(
+            normalized_frequencies.get(word, 0)
+            for word in words
+        ) / math.sqrt(len(words))
+
+        title_score = sum(
+            1 for word in words
+            if word in title_words
+        )
+
+        position_score = max(
+            0,
+            1 - index * 0.05,
+        )
+
+        total_score = (
+            frequency_score
+            + title_score * 0.7
+            + position_score * 0.3
+        )
+
+        scored_sentences.append(
+            (index, total_score, sentence)
+        )
+
+    selected = sorted(
+        scored_sentences,
+        key=lambda item: item[1],
+        reverse=True,
+    )[:sentence_count]
+
+    selected = sorted(
+        selected,
+        key=lambda item: item[0],
+    )
+
+    summaries = [
+        sentence
+        for _, _, sentence in selected
+    ]
+
+    return summaries or sentences[:sentence_count]
+
+
 def contains_any(text: str, keywords: list[str]) -> bool:
     lowered = text.lower()
-    return any(keyword.lower() in lowered for keyword in keywords)
+    return any(
+        keyword.lower() in lowered
+        for keyword in keywords
+    )
 
 
 def classify_category(article: dict[str, str]) -> str:
     text = (
         f"{article['title']} "
         f"{article['source']} "
+        f"{article['description']} "
         f"{article['search_keyword']}"
     )
 
@@ -264,7 +490,8 @@ def classify_category(article: dict[str, str]) -> str:
 
     for category, keywords in CATEGORY_RULES.items():
         scores[category] = sum(
-            1 for keyword in keywords
+            1
+            for keyword in keywords
             if keyword.lower() in text.lower()
         )
 
@@ -277,7 +504,11 @@ def classify_category(article: dict[str, str]) -> str:
 
 
 def detect_organization(article: dict[str, str]) -> str:
-    text = f"{article['title']} {article['source']}"
+    text = (
+        f"{article['title']} "
+        f"{article['source']} "
+        f"{article['description']}"
+    )
 
     for organization, keywords in ORGANIZATION_RULES.items():
         if contains_any(text, keywords):
@@ -290,27 +521,22 @@ def detect_organization(article: dict[str, str]) -> str:
 
 
 def detect_countries(article: dict[str, str]) -> list[str]:
-    text = article["title"].lower()
+    text = (
+        f"{article['title']} "
+        f"{article['description']} "
+        f"{article.get('article_text', '')}"
+    ).lower()
+
     countries = []
 
     for country, keywords in COUNTRY_RULES.items():
-        if any(keyword.lower() in text for keyword in keywords):
+        if any(
+            keyword.lower() in text
+            for keyword in keywords
+        ):
             countries.append(country)
 
     return countries
-
-
-def count_keywords(articles: list[dict[str, str]]) -> list[tuple[str, int]]:
-    counts = Counter()
-
-    for article in articles:
-        text = f"{article['title']} {article['source']}".lower()
-
-        for keyword in KEYWORD_CANDIDATES:
-            if keyword.lower() in text:
-                counts[keyword] += 1
-
-    return counts.most_common(10)
 
 
 def enrich_articles(
@@ -318,14 +544,63 @@ def enrich_articles(
 ) -> list[dict[str, object]]:
     enriched = []
 
-    for article in articles:
+    for index, article in enumerate(articles, start=1):
+        print(
+            f"기사 본문 수집 중 "
+            f"({index}/{len(articles)}): "
+            f"{article['title'][:40]}"
+        )
+
+        final_url, article_text = fetch_article_text(
+            article["link"]
+        )
+
+        summary = summarize_text(
+            title=article["title"],
+            text=article_text,
+            fallback=article["description"],
+            sentence_count=3,
+        )
+
         enriched_article = dict(article)
-        enriched_article["category"] = classify_category(article)
-        enriched_article["organization"] = detect_organization(article)
-        enriched_article["countries"] = detect_countries(article)
+        enriched_article["link"] = final_url
+        enriched_article["article_text"] = article_text
+        enriched_article["summary"] = summary
+        enriched_article["category"] = classify_category(
+            article
+        )
+        enriched_article["organization"] = (
+            detect_organization(article)
+        )
+        enriched_article["countries"] = detect_countries(
+            enriched_article
+        )
+
         enriched.append(enriched_article)
 
+        # 언론사 서버에 과도한 요청을 보내지 않도록 잠시 대기
+        time.sleep(0.4)
+
     return enriched
+
+
+def count_keywords(
+    articles: list[dict[str, object]],
+) -> list[tuple[str, int]]:
+    counts = Counter()
+
+    for article in articles:
+        text = (
+            f"{article['title']} "
+            f"{article['source']} "
+            f"{article.get('article_text', '')}"
+        ).lower()
+
+        for keyword in KEYWORD_CANDIDATES:
+            if keyword.lower() in text:
+                counts[keyword] += 1
+
+    return counts.most_common(10)
 
 
 def render_category_sections(
@@ -342,9 +617,10 @@ def render_category_sections(
 
     for category in categories:
         category_articles = [
-            article for article in articles
+            article
+            for article in articles
             if article["category"] == category
-        ]
+        ][:MAX_ARTICLES_PER_SECTION]
 
         output.append(
             f"""
@@ -355,26 +631,51 @@ def render_category_sections(
 
         if not category_articles:
             output.append(
-                '<p class="empty">관련 기사가 없습니다.</p>'
+                '<p class="empty">'
+                '관련 기사가 없습니다.'
+                '</p>'
             )
         else:
             grouped = defaultdict(list)
 
             for article in category_articles:
-                grouped[str(article["organization"])].append(article)
+                grouped[
+                    str(article["organization"])
+                ].append(article)
 
-            for organization, organization_articles in grouped.items():
+            for organization, org_articles in grouped.items():
                 output.append(
                     f"<h3>● {html.escape(organization)}</h3>"
                 )
-                output.append("<ul>")
 
-                for article in organization_articles[:5]:
-                    output.append(
-                        f"<li>{html.escape(str(article['title']))}</li>"
+                for article in org_articles:
+                    title = html.escape(
+                        str(article["title"])
+                    )
+                    source = html.escape(
+                        str(article["source"])
                     )
 
-                output.append("</ul>")
+                    summary_items = "".join(
+                        f"<li>{html.escape(str(item))}</li>"
+                        for item in article["summary"]
+                    )
+
+                    output.append(
+                        f"""
+                        <article class="news-summary">
+                            <h4>{title}</h4>
+
+                            <ul>
+                                {summary_items}
+                            </ul>
+
+                            <div class="summary-source">
+                                출처: {source}
+                            </div>
+                        </article>
+                        """
+                    )
 
         output.append("</section>")
 
@@ -391,16 +692,23 @@ def render_country_section(
             country_counts[str(country)] += 1
 
     if not country_counts:
-        return '<p class="empty">확인된 국가명이 없습니다.</p>'
+        return (
+            '<p class="empty">'
+            '확인된 국가명이 없습니다.'
+            '</p>'
+        )
 
     items = []
 
     for country, count in country_counts.most_common(12):
         flag = COUNTRY_FLAGS.get(country, "🌍")
+
         items.append(
             f"""
             <div class="country-item">
-                <span>{flag} {html.escape(country)}</span>
+                <span>
+                    {flag} {html.escape(country)}
+                </span>
                 <strong>{count}건</strong>
             </div>
             """
@@ -415,7 +723,11 @@ def render_keyword_section(
     keyword_counts = count_keywords(articles)
 
     if not keyword_counts:
-        return '<p class="empty">추출된 키워드가 없습니다.</p>'
+        return (
+            '<p class="empty">'
+            '추출된 키워드가 없습니다.'
+            '</p>'
+        )
 
     return "\n".join(
         f"""
@@ -433,19 +745,28 @@ def render_original_articles(
 ) -> str:
     items = []
 
-    for index, article in enumerate(articles, start=1):
+    for article in articles:
         title = html.escape(str(article["title"]))
-        link = html.escape(str(article["link"]), quote=True)
+        link = html.escape(
+            str(article["link"]),
+            quote=True,
+        )
         source = html.escape(str(article["source"]))
-        category = html.escape(str(article["category"]))
+        category = html.escape(
+            str(article["category"])
+        )
 
         items.append(
             f"""
             <li>
-                <a href="{link}" target="_blank"
-                   rel="noopener noreferrer">
+                <a
+                    href="{link}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     {title}
                 </a>
+
                 <div class="article-meta">
                     {source} · {category}
                 </div>
@@ -462,13 +783,28 @@ def create_html(
     now = datetime.now(KST)
 
     category_counts = Counter(
-        str(article["category"]) for article in articles
+        str(article["category"])
+        for article in articles
     )
 
-    category_sections = render_category_sections(articles)
-    country_section = render_country_section(articles)
-    keyword_section = render_keyword_section(articles)
-    original_articles = render_original_articles(articles)
+    extracted_count = sum(
+        1
+        for article in articles
+        if article.get("article_text")
+    )
+
+    category_sections = render_category_sections(
+        articles
+    )
+    country_section = render_country_section(
+        articles
+    )
+    keyword_section = render_keyword_section(
+        articles
+    )
+    original_articles = render_original_articles(
+        articles
+    )
 
     return f"""<!DOCTYPE html>
 <html lang="ko">
@@ -497,12 +833,12 @@ def create_html(
                 "Apple SD Gothic Neo",
                 Arial,
                 sans-serif;
-            line-height: 1.7;
+            line-height: 1.75;
             word-break: keep-all;
         }}
 
         .container {{
-            max-width: 960px;
+            max-width: 980px;
             margin: 0 auto;
             padding: 48px 24px 80px;
         }}
@@ -539,27 +875,47 @@ def create_html(
         }}
 
         .brief-section {{
-            padding: 24px 0;
+            padding: 30px 0;
             border-bottom: 1px solid #dddddd;
         }}
 
         .brief-section h2 {{
-            margin: 0 0 18px;
+            margin: 0 0 22px;
             color: #173f73;
             font-size: 23px;
         }}
 
         .brief-section h3 {{
-            margin: 20px 0 7px;
-            font-size: 18px;
+            margin: 28px 0 12px;
+            font-size: 19px;
         }}
 
-        .brief-section ul {{
-            margin-top: 4px;
+        .news-summary {{
+            margin-bottom: 24px;
+            padding: 18px 20px;
+            background: #fafafa;
+            border: 1px solid #e0e3e7;
         }}
 
-        .brief-section li {{
+        .news-summary h4 {{
+            margin: 0 0 12px;
+            font-size: 17px;
+            line-height: 1.55;
+        }}
+
+        .news-summary ul {{
+            margin: 0;
+            padding-left: 22px;
+        }}
+
+        .news-summary li {{
             margin-bottom: 8px;
+        }}
+
+        .summary-source {{
+            margin-top: 12px;
+            color: #777777;
+            font-size: 13px;
         }}
 
         .country-grid {{
@@ -647,6 +1003,10 @@ def create_html(
             h1 {{
                 font-size: 27px;
             }}
+
+            .news-summary {{
+                padding: 15px;
+            }}
         }}
     </style>
 </head>
@@ -655,7 +1015,9 @@ def create_html(
     <main class="container">
         <header>
             <h1>한국 국제개발협력 Daily Brief</h1>
-            <div class="date">{now:%Y.%m.%d}</div>
+            <div class="date">
+                {now:%Y.%m.%d}
+            </div>
         </header>
 
         <hr class="divider">
@@ -664,19 +1026,31 @@ def create_html(
             <h2>오늘의 핵심</h2>
 
             <ul>
-                <li>국제개발협력 기사 {len(articles)}건</li>
+                <li>
+                    국제개발협력 기사
+                    {len(articles)}건
+                </li>
+
+                <li>
+                    기사 본문 추출 성공
+                    {extracted_count}건
+                </li>
+
                 <li>
                     정책·ODA 관련
                     {category_counts.get("정책·ODA", 0)}건
                 </li>
+
                 <li>
                     NGO 관련
                     {category_counts.get("NGO·시민사회", 0)}건
                 </li>
+
                 <li>
                     해외봉사 관련
                     {category_counts.get("해외봉사", 0)}건
                 </li>
+
                 <li>
                     인도적 지원 관련
                     {category_counts.get("인도적 지원", 0)}건
@@ -713,9 +1087,11 @@ def create_html(
         </section>
 
         <p class="notice">
-            본 브리핑은 뉴스 제목과 출처를 기준으로 자동 분류한
-            결과입니다. 세부 사실관계는 기사 원문 및 관계기관의
-            공식 발표자료를 확인하시기 바랍니다.
+            본 브리핑은 기사 본문에서 핵심 문장을 자동 선별한
+            추출형 요약입니다. 언론사 접근 제한이나 페이지 구조에
+            따라 일부 기사는 RSS 설명 또는 기사 제목을 기준으로
+            표시될 수 있습니다. 중요한 내용은 원문과 공식 발표를
+            함께 확인하시기 바랍니다.
         </p>
     </main>
 </body>
@@ -731,11 +1107,11 @@ def create_readme(
     lines = [
         "# 한국 국제개발협력 Daily Brief",
         "",
-        f"> 최근 업데이트: {now:%Y-%m-%d %H:%M} KST",
+        f"> 최근 업데이트: "
+        f"{now:%Y-%m-%d %H:%M} KST",
         "",
-        "GitHub Pages에서 최신 브리핑을 확인할 수 있습니다.",
-        "",
-        "## 수집 결과",
+        "GitHub Pages에서 기사별 핵심 요약과 "
+        "최신 브리핑을 확인할 수 있습니다.",
         "",
         f"- 전체 기사: {len(articles)}건",
         "",
@@ -745,28 +1121,42 @@ def create_readme(
 
 
 def main() -> None:
-    print("뉴스 수집 시작")
+    print("1. 뉴스 수집 시작")
 
     articles = collect_news()
 
+    print(f"2. RSS 기사 {len(articles)}건 수집 완료")
+
     if not articles:
         raise RuntimeError(
-            "수집된 뉴스가 없습니다. RSS 검색 결과를 확인하세요."
+            "수집된 뉴스가 없습니다. "
+            "RSS 검색 결과를 확인하세요."
         )
 
     enriched_articles = enrich_articles(articles)
 
-    page_html = create_html(enriched_articles)
-    readme_content = create_readme(enriched_articles)
+    print("3. 기사 본문 추출 및 요약 완료")
 
-    with open("index.html", "w", encoding="utf-8") as file:
+    page_html = create_html(enriched_articles)
+    readme_content = create_readme(
+        enriched_articles
+    )
+
+    with open(
+        "index.html",
+        "w",
+        encoding="utf-8",
+    ) as file:
         file.write(page_html)
 
-    with open("README.md", "w", encoding="utf-8") as file:
+    with open(
+        "README.md",
+        "w",
+        encoding="utf-8",
+    ) as file:
         file.write(readme_content)
 
-    print(f"뉴스 {len(enriched_articles)}건 수집 완료")
-    print("index.html과 README.md 생성 완료")
+    print("4. index.html과 README.md 생성 완료")
 
 
 if __name__ == "__main__":
