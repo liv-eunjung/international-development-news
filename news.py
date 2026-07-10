@@ -239,8 +239,10 @@ def google_news_rss_url(keyword: str) -> str:
 
 
 def clean_text(value: str) -> str:
-    value = re.sub(r"<[^>]+>", "", value or "")
+    value = html.unescape(value or "")
+    value = re.sub(r"<[^>]+>", " ", value)
     value = value.replace("\n", " ").replace("\r", " ")
+    value = value.replace("\xa0", " ")
     return re.sub(r"\s+", " ", value).strip()
 
 
@@ -360,16 +362,13 @@ def split_sentences(text: str) -> list[str]:
     for sentence in sentences:
         sentence = sentence.strip()
 
-        if len(sentence) < 25:
+        if len(sentence) < 20:
             continue
-
-        if len(sentence) > 300:
-            sentence = sentence[:300].rstrip() + "…"
 
         result.append(sentence)
 
     return result
-
+    
 
 def tokenize(text: str) -> list[str]:
     words = re.findall(
@@ -837,11 +836,11 @@ def create_html(
             word-break: keep-all;
         }}
 
-        .container {{
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 48px 24px 80px;
-        }}
+    .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+}
 
         h1 {{
             margin: 0 0 6px;
@@ -890,27 +889,47 @@ def create_html(
             font-size: 19px;
         }}
 
-        .news-summary {{
-            margin-bottom: 24px;
-            padding: 18px 20px;
-            background: #fafafa;
-            border: 1px solid #e0e3e7;
-        }}
+.news-summary {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 24px;
+    padding: 18px 20px;
+    background: #fafafa;
+    border: 1px solid #e0e3e7;
+    overflow: visible;
+}
 
-        .news-summary h4 {{
-            margin: 0 0 12px;
-            font-size: 17px;
-            line-height: 1.55;
-        }}
+.news-summary h4 {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 12px;
+    font-size: 17px;
+    line-height: 1.55;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
 
-        .news-summary ul {{
-            margin: 0;
-            padding-left: 22px;
-        }}
+.news-summary ul {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding-left: 22px;
+}
 
-        .news-summary li {{
-            margin-bottom: 8px;
-        }}
+.news-summary li {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 8px;
+    line-height: 1.8;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
 
         .summary-source {{
             margin-top: 12px;
