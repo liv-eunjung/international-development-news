@@ -1,0 +1,27 @@
+name: International Development News
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 23 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  collect-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 저장소 불러오기
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 실행 확인
+        run: |
+          echo "국제개발협력 뉴스 수집 작업을 시작합니다."
+          date
