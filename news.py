@@ -680,15 +680,22 @@ def render_category_sections(
 
     return "\n".join(output)
 
-
 def render_country_section(
     articles: list[dict[str, object]],
 ) -> str:
-    country_articles = defaultdict(list)
+    country_articles: dict[str, list[dict[str, object]]] = defaultdict(list)
 
     for article in articles:
-        for country in article["countries"]:
-            country_articles[str(country)].append(article)
+        countries = article.get("countries", [])
+
+        if not isinstance(countries, list):
+            continue
+
+        for country in countries:
+            country_name = str(country).strip()
+
+            if country_name:
+                country_articles[country_name].append(article)
 
     if not country_articles:
         return (
@@ -697,7 +704,7 @@ def render_country_section(
             '</p>'
         )
 
-    items = []
+    items: list[str] = []
 
     sorted_countries = sorted(
         country_articles.items(),
@@ -707,17 +714,22 @@ def render_country_section(
 
     for country, related_articles in sorted_countries[:12]:
         flag = COUNTRY_FLAGS.get(country, "🌍")
-
-        article_links = []
+        article_links: list[str] = []
 
         for article in related_articles:
-            title = html.escape(str(article["title"]))
+            title = html.escape(
+                str(article.get("title") or "제목 없음")
+            )
             link = html.escape(
-                str(article["link"]),
+                str(article.get("link") or "#"),
                 quote=True,
             )
-            source = html.escape(str(article["source"]))
-            category = html.escape(str(article["category"]))
+            source = html.escape(
+                str(article.get("source") or "출처 미확인")
+            )
+            category = html.escape(
+                str(article.get("category") or "기타")
+            )
 
             article_links.append(
                 f"""
@@ -729,6 +741,7 @@ def render_country_section(
                     >
                         {title}
                     </a>
+
                     <div class="country-article-meta">
                         {source} · {category}
                     </div>
@@ -736,22 +749,30 @@ def render_country_section(
                 """
             )
 
+        article_list_html = "\n".join(article_links)
+
         items.append(
             f"""
             <details class="country-item">
                 <summary>
-                    <span>{flag} {html.escape(country)}</span>
-                    <strong>{len(related_articles)}건</strong>
+                    <span>
+                        {flag} {html.escape(country)}
+                    </span>
+
+                    <strong>
+                        {len(related_articles)}건
+                    </strong>
                 </summary>
 
                 <ul class="country-article-list">
-                    {''.join(article_links)}
+                    {article_list_html}
                 </ul>
             </details>
             """
         )
 
     return "\n".join(items)
+
 
 def render_keyword_section(
     articles: list[dict[str, object]],
@@ -1225,42 +1246,61 @@ def create_readme(
 
 
 def main() -> None:
-    print("1. 뉴스 수집 시작")
+    try:
+        print("1. 뉴스 수집 시작")
 
-    articles = collect_news()
+        articles = collect_news()
 
-    print(f"2. RSS 기사 {len(articles)}건 수집 완료")
+        print(f"2. RSS 기사 {len(articles)}건 수집 완료")
 
-    if not articles:
-        raise RuntimeError(
-            "수집된 뉴스가 없습니다. "
-            "RSS 검색 결과를 확인하세요."
-        )
+        if not articles:
+            raise RuntimeError(
+                "수집된 뉴스가 없습니다. "
+                "RSS 검색 결과를 확인하세요."
+            )
 
-    enriched_articles = enrich_articles(articles)
+        enriched_articles = enrich_articles(articles)
 
-    print("3. 기사 본문 추출 및 요약 완료")
+        print("3. 기사 본문 추출 및 요약 완료")
 
-    page_html = create_html(enriched_articles)
-    readme_content = create_readme(
-        enriched_articles
-    )
+        print("4-1. HTML 본문 생성 시작")
+        page_html = create_html(enriched_articles)
+        print("4-2. HTML 본문 생성 완료")
 
-    with open(
-        "index.html",
-        "w",
-        encoding="utf-8",
-    ) as file:
-        file.write(page_html)
+        print("4-3. README 생성 시작")
+        readme_content = create_readme(enriched_articles)
+        print("4-4. README 생성 완료")
 
-    with open(
-        "README.md",
-        "w",
-        encoding="utf-8",
-    ) as file:
-        file.write(readme_content)
+        print("5-1. index.html 저장 시작")
+        with open(
+            "index.html",
+            "w",
+            encoding="utf-8",
+        ) as file:
+            file.write(page_html)
 
-    print("4. index.html과 README.md 생성 완료")
+        print("5-2. README.md 저장 시작")
+        with open(
+            "README.md",
+            "w",
+            encoding="utf-8",
+        ) as file:
+            file.write(readme_content)
+
+        print("5-3. index.html과 README.md 생성 완료")
+
+    except Exception as error:
+        import traceback
+
+        print("")
+        print("=" * 60)
+        print("작업 중 오류 발생")
+        print(f"오류 종류: {type(error).__name__}")
+        print(f"오류 내용: {error}")
+        print("=" * 60)
+
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":
