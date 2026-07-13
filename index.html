@@ -15,6 +15,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
             background: #ffffff;
@@ -29,15 +33,17 @@
             word-break: keep-all;
         }
 
-    .container {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
-}
+        .container {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
 
         h1 {
             margin: 0 0 6px;
             font-size: 34px;
+            line-height: 1.35;
         }
 
         .date {
@@ -66,7 +72,12 @@
             margin-bottom: 0;
         }
 
+        .summary li {
+            margin-bottom: 6px;
+        }
+
         .brief-section {
+            width: 100%;
             padding: 30px 0;
             border-bottom: 1px solid #dddddd;
         }
@@ -82,47 +93,47 @@
             font-size: 19px;
         }
 
-.news-summary {
-    width: 100%;
-    max-width: 100%;
-    margin-bottom: 24px;
-    padding: 18px 20px;
-    background: #fafafa;
-    border: 1px solid #e0e3e7;
-    overflow: visible;
-}
+        .news-summary {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 24px;
+            padding: 18px 20px;
+            background: #fafafa;
+            border: 1px solid #e0e3e7;
+            overflow: visible;
+        }
 
-.news-summary h4 {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 0 12px;
-    font-size: 17px;
-    line-height: 1.55;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
+        .news-summary h4 {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 0 12px;
+            font-size: 17px;
+            line-height: 1.55;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
 
-.news-summary ul {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding-left: 22px;
-}
+        .news-summary ul {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding-left: 22px;
+        }
 
-.news-summary li {
-    width: 100%;
-    max-width: 100%;
-    margin-bottom: 8px;
-    line-height: 1.8;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
+        .news-summary li {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 9px;
+            line-height: 1.8;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
 
         .summary-source {
             margin-top: 12px;
@@ -132,17 +143,74 @@
 
         .country-grid {
             display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: 1fr;
             gap: 10px;
         }
 
         .country-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 12px;
+            width: 100%;
             background: #f7f8fa;
             border: 1px solid #e0e3e7;
+        }
+
+        .country-item summary {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 13px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            list-style: none;
+        }
+
+        .country-item summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .country-item summary::after {
+            content: "＋";
+            color: #2457a6;
+            font-size: 18px;
+        }
+
+        .country-item[open] summary::after {
+            content: "−";
+        }
+
+        .country-item[open] summary {
+            background: #eef3f8;
+        }
+
+        .country-article-list {
+            width: 100%;
+            margin: 0;
+            padding: 16px 24px 18px 44px;
+            background: #ffffff;
+            border-top: 1px solid #e0e3e7;
+        }
+
+        .country-article-list li {
+            margin-bottom: 15px;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .country-article-list a {
+            color: #1456a0;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .country-article-list a:hover {
+            text-decoration: underline;
+        }
+
+        .country-article-meta {
+            margin-top: 3px;
+            color: #777777;
+            font-size: 13px;
         }
 
         .keywords {
@@ -153,8 +221,8 @@
 
         .keyword {
             display: inline-flex;
-            gap: 6px;
             align-items: center;
+            gap: 7px;
             padding: 7px 11px;
             background: #eef3f8;
             border-radius: 20px;
@@ -177,6 +245,8 @@
 
         .articles li {
             margin-bottom: 17px;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         .articles a {
@@ -209,15 +279,27 @@
 
         @media (max-width: 640px) {
             .container {
-                padding: 28px 18px 60px;
+                padding: 28px 16px 60px;
             }
 
             h1 {
                 font-size: 27px;
             }
 
+            .summary {
+                padding: 18px;
+            }
+
             .news-summary {
                 padding: 15px;
+            }
+
+            .country-item summary {
+                padding: 12px;
+            }
+
+            .country-article-list {
+                padding: 14px 18px 16px 34px;
             }
         }
     </style>
@@ -227,8 +309,9 @@
     <main class="container">
         <header>
             <h1>한국 국제개발협력 Daily Brief</h1>
+
             <div class="date">
-                2026.07.10
+                2026.07.13
             </div>
         </header>
 
@@ -240,173 +323,434 @@
             <ul>
                 <li>
                     국제개발협력 기사
-                    24건
+                    <strong>24건</strong>
                 </li>
 
                 <li>
                     기사 본문 추출 성공
-                    0건
+                    <strong>0건</strong>
                 </li>
 
                 <li>
                     정책·ODA 관련
-                    24건
+                    <strong>24건</strong>
                 </li>
 
                 <li>
                     NGO 관련
-                    0건
+                    <strong>0건</strong>
                 </li>
 
                 <li>
                     해외봉사 관련
-                    0건
+                    <strong>0건</strong>
                 </li>
 
                 <li>
                     인도적 지원 관련
-                    0건
+                    <strong>0건</strong>
                 </li>
             </ul>
         </section>
 
         <hr class="divider">
 
-        
-            <section class="brief-section">
-                <h2>■ 정책·ODA</h2>
-            
-<h3>● KOICA</h3>
-
-                        <article class="news-summary">
-                            <h4>코이카, 공공데이터 활용 챌린지 성료… 실용성 돋보인 아이디어 대상 - 부산일보</h4>
-
-                            <ul>
-                                <li>코이카, 공공데이터 활용 챌린지 성료… 실용성 돋보인 아이디어 대상 부산일보</li>
-                            </ul>
-
-                            <div class="summary-source">
-                                출처: 부산일보
-                            </div>
-                        </article>
-                        
-
-                        <article class="news-summary">
-                            <h4>최빈국 졸업 앞둔 라오스…KOICA, &#x27;지속가능한 자립 모델&#x27; 심는다 - 재외동포신문</h4>
-
-                            <ul>
-                                <li>최빈국 졸업 앞둔 라오스…KOICA, &#x27;지속가능한 자립 모델&#x27; 심는다 재외동포신문</li>
-                            </ul>
-
-                            <div class="summary-source">
-                                출처: 재외동포신문
-                            </div>
-                        </article>
-                        
-<h3>● 대한경제</h3>
-
-                        <article class="news-summary">
-                            <h4>국제개발협력학회, 부산서 2026년 하계학술대회 개최…한국 ODA 전략 방향 모색 - 대한경제</h4>
-
-                            <ul>
-                                <li>국제개발협력학회, 부산서 2026년 하계학술대회 개최…한국 ODA 전략 방향 모색 대한경제</li>
-                            </ul>
-
-                            <div class="summary-source">
-                                출처: 대한경제
-                            </div>
-                        </article>
-                        
-<h3>● 외교부</h3>
-
-                        <article class="news-summary">
-                            <h4>외교부, 개발협력 시민사회와 정책대화 개최 - acn-news.com</h4>
-
-                            <ul>
-                                <li>외교부, 개발협력 시민사회와 정책대화 개최 acn-news.com</li>
-                            </ul>
-
-                            <div class="summary-source">
-                                출처: acn-news.com
-                            </div>
-                        </article>
-                        
+        <section class="brief-section">
+<h2>■ 정책·ODA</h2>
 <h3>● 연합뉴스</h3>
 
-                        <article class="news-summary">
-                            <h4>국제개발협력학회장에 정헌주 연세대 교수…&quot;파트너십 강화&quot; - 연합뉴스</h4>
+<article class="news-summary">
+    <h4>&quot;한국 시민사회, 공적개발원조 공동 설계자&quot;…유엔 무대서 주목 - 연합뉴스</h4>
 
-                            <ul>
-                                <li>국제개발협력학회장에 정헌주 연세대 교수…&quot;파트너십 강화&quot; 연합뉴스</li>
-                            </ul>
+    <ul>
+        <li>&quot;한국 시민사회, 공적개발원조 공동 설계자&quot;…유엔 무대서 주목 연합뉴스</li>
+    </ul>
 
-                            <div class="summary-source">
-                                출처: 연합뉴스
-                            </div>
-                        </article>
-                        
-<h3>● 메트로신문</h3>
+    <div class="summary-source">
+        출처: 연합뉴스
+    </div>
+</article>
 
-                        <article class="news-summary">
-                            <h4>국제개발협력학회, 부산 동서대서 하계 학술대회 개최 - 메트로신문</h4>
+<h3>● 한국NGO신문</h3>
 
-                            <ul>
-                                <li>국제개발협력학회, 부산 동서대서 하계 학술대회 개최 메트로신문</li>
-                            </ul>
+<article class="news-summary">
+    <h4>한국 NGO, 유엔서 정부 협력모델 소개…국제사회 모범사례로 주목 - 한국NGO신문</h4>
 
-                            <div class="summary-source">
-                                출처: 메트로신문
-                            </div>
-                        </article>
-                        
+    <ul>
+        <li>한국 NGO, 유엔서 정부 협력모델 소개…국제사회 모범사례로 주목 한국NGO신문</li>
+    </ul>
+
+    <div class="summary-source">
+        출처: 한국NGO신문
+    </div>
+</article>
+
+<h3>● 공감신문</h3>
+
+<article class="news-summary">
+    <h4>&quot;한국 국제개발협력 시민사회, 유엔 무대에서 새로운 모델로 주목받다&quot; - 공감신문</h4>
+
+    <ul>
+        <li>&quot;한국 국제개발협력 시민사회, 유엔 무대에서 새로운 모델로 주목받다&quot; 공감신문</li>
+    </ul>
+
+    <div class="summary-source">
+        출처: 공감신문
+    </div>
+</article>
+
+<h3>● KOICA</h3>
+
+<article class="news-summary">
+    <h4>월드비전·KOICA, 개발협력 현장의 갈등 예방·평화구축 역량 높인다 - 뉴스탭</h4>
+
+    <ul>
+        <li>월드비전·KOICA, 개발협력 현장의 갈등 예방·평화구축 역량 높인다 뉴스탭</li>
+    </ul>
+
+    <div class="summary-source">
+        출처: 뉴스탭
+    </div>
+</article>
+
+<h3>● v.daum.net</h3>
+
+<article class="news-summary">
+    <h4>울산과학대학교, 베트남 현지서 ‘울산형 ODA 초급 전문가’ 양성 프로그램 실시 - v.daum.net</h4>
+
+    <ul>
+        <li>울산과학대학교, 베트남 현지서 ‘울산형 ODA 초급 전문가’ 양성 프로그램 실시 v.daum.net</li>
+    </ul>
+
+    <div class="summary-source">
+        출처: v.daum.net
+    </div>
+</article>
+
+<h3>● KDI 경제교육</h3>
+
+<article class="news-summary">
+    <h4>한국 ODA의 전 정부적 조정방안 연구: 주요 공여국 사례를 중심으로 - KDI 경제교육</h4>
+
+    <ul>
+        <li>한국 ODA의 전 정부적 조정방안 연구: 주요 공여국 사례를 중심으로 KDI 경제교육</li>
+    </ul>
+
+    <div class="summary-source">
+        출처: KDI 경제교육
+    </div>
+</article>
+
+<h3>● 외교부</h3>
+
+<article class="news-summary">
+    <h4>동서대-외교부, 글로벌 원조 재편 속 한국 ODA의 전략 방향과 협력 모델 논의 - 한국대학신문</h4>
+
+    <ul>
+        <li>동서대-외교부, 글로벌 원조 재편 속 한국 ODA의 전략 방향과 협력 모델 논의 한국대학신문</li>
+    </ul>
+
+    <div class="summary-source">
+        출처: 한국대학신문
+    </div>
+</article>
+
 </section>
-
-            <section class="brief-section">
-                <h2>■ NGO·시민사회</h2>
-            
+<section class="brief-section">
+<h2>■ NGO·시민사회</h2>
 <p class="empty">관련 기사가 없습니다.</p>
 </section>
-
-            <section class="brief-section">
-                <h2>■ 해외봉사</h2>
-            
+<section class="brief-section">
+<h2>■ 해외봉사</h2>
 <p class="empty">관련 기사가 없습니다.</p>
 </section>
-
-            <section class="brief-section">
-                <h2>■ 인도적 지원</h2>
-            
+<section class="brief-section">
+<h2>■ 인도적 지원</h2>
 <p class="empty">관련 기사가 없습니다.</p>
 </section>
 
         <section class="brief-section">
             <h2>■ 국가별</h2>
 
+            <p>
+                국가명을 클릭하면 관련 기사목록이 펼쳐집니다.
+            </p>
+
             <div class="country-grid">
                 
-            <div class="country-item">
-                <span>
-                    🇰🇷 대한민국
-                </span>
-                <strong>10건</strong>
-            </div>
-            
+<details class="country-item">
+    <summary>
+        <span>
+            🇰🇷 대한민국
+        </span>
 
-            <div class="country-item">
-                <span>
-                    🇵🇸 팔레스타인
-                </span>
-                <strong>4건</strong>
-            </div>
-            
+        <strong>
+            11건
+        </strong>
+    </summary>
 
-            <div class="country-item">
-                <span>
-                    🇱🇦 라오스
-                </span>
-                <strong>1건</strong>
-            </div>
-            
+    <ul class="country-article-list">
+        
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE1Ha09CQmNZd25kQWV2c21xblREcVNIUUlsM2U2UXJsek9nblZZdGVfZEFYWXRxUlpJbDJ0N3FyYmoybWxONVlWRW4zZlZSMEo1OWR2bmdhdzZPc01fZmFaTdIBYEFVX3lxTE1Ha09CQmNZd25kQWV2c21xblREcVNIUUlsM2U2UXJsek9nblZZdGVfZEFYWXRxUlpJbDJ0N3FyYmoybWxONVlWRW4zZlZSMEo1OWR2bmdhdzZPc01fZmFaTQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        &quot;한국 시민사회, 공적개발원조 공동 설계자&quot;…유엔 무대서 주목 - 연합뉴스
+    </a>
+
+    <div class="country-article-meta">
+        연합뉴스 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE51dHZuNGJmTzU2SkJKRURwQ0Y1ek5wb2l3Q3NydUl2bVFMb0hhTkJpZGFOdGZKYXZaV0NxRDYzV20zbVRlVS1kZkNWLWxSTjJ0UTZUVzlpdDhqeVdaLXZnZmJrNlJYLWFS?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        한국 NGO, 유엔서 정부 협력모델 소개…국제사회 모범사례로 주목 - 한국NGO신문
+    </a>
+
+    <div class="country-article-meta">
+        한국NGO신문 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9IcjRjZVNfVi1TNXlZREZaSTZCQk5vVElKbkJsWExlWGpaUmVQVUFSZGgwUGREcXlHZ2UzUEktaHlBUUVGWkN5d2lMMDZFVmJTZW5rMnlkLUo2bGdfOWxTT1RWTkhUMlZ5?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        &quot;한국 국제개발협력 시민사회, 유엔 무대에서 새로운 모델로 주목받다&quot; - 공감신문
+    </a>
+
+    <div class="country-article-meta">
+        공감신문 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNUWpmRjJIdkVRUkZ5dHFieUxFbl94em5wQkFiVU5JdHlDbXJKX0xOOGg5bVJSTlRfQUY1bXpseTZOa0JXN0M4Yk5VbU5ucHZsNDZoZmNjN19yN3V6anNYTWhtUWNUT2pOWkU4TEFGVF96N2lWYWFzR1ZFM1MwVkZxZ1RwUy00VmRvZDZuOGw0cGZ6dExZVDJyc3BHMFFQZlJCRUE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        한국 ODA의 전 정부적 조정방안 연구: 주요 공여국 사례를 중심으로 - KDI 경제교육
+    </a>
+
+    <div class="country-article-meta">
+        KDI 경제교육 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiZkFVX3lxTE1iRkVwQzMydlFsMzNFbU1WZjBxSGJjenRLMVdTTElsaUJnNXVtTDBHWjBUM2Y2QUNYSWZYMEJtemhHV0ZvMWtKMVE4aWlEelRhRkVLLWVlUnJPZGdRT0xKNlJLbWpydw?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        동서대-외교부, 글로벌 원조 재편 속 한국 ODA의 전략 방향과 협력 모델 논의 - 한국대학신문
+    </a>
+
+    <div class="country-article-meta">
+        한국대학신문 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMi5gJBVV95cUxQMWhqTmNDQWswQTFRUEZEelpPS19OS1F4ZVJSVXh6N2lBMjV6Y01EcGFIMnQ4YTJBQ1RlcExCdHZPcWdDSHhoUVhPLUZIdTYzME1Gbi1mcDMtTkZRVzlVRWluNWJ5UXg3T2lIc0dLTU0tU0ZxZWs4S3pKcnV5RHNpSll3T0Yxd1dOWmpRS3hqMmNDaUhIcmJNOFVHX2xTd3I1dHlaQ1Q5WUhxNjk3ZnZJdnhPVWNxX3VJakE5U3hzTklISG0xbENudS0tWDJPcm93T3lYZkxPTW1pd21EaEtxT19xUWJxaHBTTnlpWGl4SFJCVWo3V0YyWUtvTTllSlRKczdnZ0pzUW5xbjhvenU3OWZFWkZ4eXlsTTAzM3Uxbll6RnUtbFppUHpqMWQzVUIwM1o1clBIN083Q0dGVE9Sd3BSUlRFOHVZT1dGOUstYTM4dUVQZ3FzNGxBZ0p2OGZiQ2xYNmFn?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        베들레헴에 &#x27;한국로&#x27; 생겼다…코이카, 팔레스타인 ODA 확대 - MSN
+    </a>
+
+    <div class="country-article-meta">
+        MSN · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiRkFVX3lxTFBmOFVOU2FPR3hndklTX0s4MU1oT1J4djd0Si11Y3FTSHN1Uy05UzBPd2hyYnM4dnNkbHVVRm5tYl8wYktlVFE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        국제개발협력학회, 하계학술대회 부산서 개최...한국 ODA 질적 도약 논의 - v.daum.net
+    </a>
+
+    <div class="country-article-meta">
+        v.daum.net · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFA1SFRkMjlLczNzemVaVWhCX3prUmttQ2l0cVViVHhKa25NRjJJbV9fMk1xcEx3dFBkYnlwaTMyaFRJQVQ0Rl9rM3YzRXBuS1VvYmMtMTJ4MDI3MldnNzhiMnBiSm4waS1o?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        KCOC, WFK KOICA-NGO봉사단 성과공유회 개최…20개국 91명 활동 성과 공유 - 한국NGO신문
+    </a>
+
+    <div class="country-article-meta">
+        한국NGO신문 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiRkFVX3lxTFBPX1J3d3pRZkxNcjI5Y09sUWkwQzRaUVQ4SnBZcTQ3VHhQV2l4SElJQ3NFSVF0Z0FOX1h0Vm4yUi1pb1pRemc?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        KCOC, ‘2024-2026 월드프렌즈코리아 KOICA-NGO봉사단’ 성과공유회 성료 - 동아경제
+    </a>
+
+    <div class="country-article-meta">
+        동아경제 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE9kSG1HUDRPX2lONkk4LV84S0JrTlJDT3AwUXVuMmRRRWY5Nmc4WFU5V2kzbGQ1ZDd6Y2tKOWF2TGVWRXI0QUhSVmFhdTZIVzk3RlE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        [사회혁신발언대] 위기 현장에서 배운 인도주의 가치, 한국 국제개발협력의 중심이 되어야 한다 - 더나은미래
+    </a>
+
+    <div class="country-article-meta">
+        더나은미래 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiW0FVX3lxTFA5YndCZDlwMXVUc0JQUTJ1Um0zcERPY21nYXRZYlZKX3JsZnlvWGE3aXluN3BvMFNFWjlMVUlNSXVQSEp4eENlTHRQU1R1QWVJNDRHUDFLNVFSTUXSAWBBVV95cUxOSnRySGp0MGNKS0Yzcm02NGJkV1h3Sjl5emF3WUtkSmZYWWlzWVIybXpzdl9MeVV6cVU3ZUdDb2Z3UzNTbXEwNUJyYl9WUFNWVkVqaWpGNG1wUDNaMGVJSWc?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        율촌·온율·호이·헤퍼코리아·기아대책, 국제개발협력상 수상 - 연합뉴스
+    </a>
+
+    <div class="country-article-meta">
+        연합뉴스 · 정책·ODA
+    </div>
+</li>
+
+    </ul>
+</details>
+
+
+<details class="country-item">
+    <summary>
+        <span>
+            🇻🇳 베트남
+        </span>
+
+        <strong>
+            1건
+        </strong>
+    </summary>
+
+    <ul class="country-article-list">
+        
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiT0FVX3lxTFBMaDVET3Q4MFI5RTNWZVFRQm5oWFVfN29XVjc3ZEIxWGNOV3VweDFWcml1dm1QclByaXY2NkJHdzRIZVRWQ0tVWG1la2FJTGs?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        울산과학대학교, 베트남 현지서 ‘울산형 ODA 초급 전문가’ 양성 프로그램 실시 - v.daum.net
+    </a>
+
+    <div class="country-article-meta">
+        v.daum.net · 정책·ODA
+    </div>
+</li>
+
+    </ul>
+</details>
+
+
+<details class="country-item">
+    <summary>
+        <span>
+            🇱🇦 라오스
+        </span>
+
+        <strong>
+            1건
+        </strong>
+    </summary>
+
+    <ul class="country-article-list">
+        
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMibEFVX3lxTFBXdVpMM2ZRQ3NScmVGd0cwRG5OUUtjUzY0QTJTY0prN21GU3EzSXRuRFpfWFRjNUJBbERqcG1MMWhlcjNESFdaazYxVXJyZ1YwZUc0Z0M1QlVtZHZQcDR5SmVLNGE0QlN4TUNLbQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        최빈국 졸업 앞둔 라오스…KOICA, &#x27;지속가능한 자립 모델&#x27; 심는다 - 재외동포신문
+    </a>
+
+    <div class="country-article-meta">
+        재외동포신문 · 정책·ODA
+    </div>
+</li>
+
+    </ul>
+</details>
+
+
+<details class="country-item">
+    <summary>
+        <span>
+            🇵🇸 팔레스타인
+        </span>
+
+        <strong>
+            1건
+        </strong>
+    </summary>
+
+    <ul class="country-article-list">
+        
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMi5gJBVV95cUxQMWhqTmNDQWswQTFRUEZEelpPS19OS1F4ZVJSVXh6N2lBMjV6Y01EcGFIMnQ4YTJBQ1RlcExCdHZPcWdDSHhoUVhPLUZIdTYzME1Gbi1mcDMtTkZRVzlVRWluNWJ5UXg3T2lIc0dLTU0tU0ZxZWs4S3pKcnV5RHNpSll3T0Yxd1dOWmpRS3hqMmNDaUhIcmJNOFVHX2xTd3I1dHlaQ1Q5WUhxNjk3ZnZJdnhPVWNxX3VJakE5U3hzTklISG0xbENudS0tWDJPcm93T3lYZkxPTW1pd21EaEtxT19xUWJxaHBTTnlpWGl4SFJCVWo3V0YyWUtvTTllSlRKczdnZ0pzUW5xbjhvenU3OWZFWkZ4eXlsTTAzM3Uxbll6RnUtbFppUHpqMWQzVUIwM1o1clBIN083Q0dGVE9Sd3BSUlRFOHVZT1dGOUstYTM4dUVQZ3FzNGxBZ0p2OGZiQ2xYNmFn?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        베들레헴에 &#x27;한국로&#x27; 생겼다…코이카, 팔레스타인 ODA 확대 - MSN
+    </a>
+
+    <div class="country-article-meta">
+        MSN · 정책·ODA
+    </div>
+</li>
+
+    </ul>
+</details>
+
             </div>
         </section>
 
@@ -415,53 +759,59 @@
 
             <div class="keywords">
                 
-        <span class="keyword">
-            NGO
-            <small>7</small>
-        </span>
-        
+<span class="keyword">
+    NGO
+    <small>7</small>
+</span>
 
-        <span class="keyword">
-            ODA
-            <small>5</small>
-        </span>
-        
 
-        <span class="keyword">
-            KOICA
-            <small>4</small>
-        </span>
-        
+<span class="keyword">
+    KOICA
+    <small>7</small>
+</span>
 
-        <span class="keyword">
-            KCOC
-            <small>3</small>
-        </span>
-        
 
-        <span class="keyword">
-            봉사단
-            <small>3</small>
-        </span>
-        
+<span class="keyword">
+    ODA
+    <small>6</small>
+</span>
 
-        <span class="keyword">
-            청년
-            <small>2</small>
-        </span>
-        
 
-        <span class="keyword">
-            시민사회
-            <small>1</small>
-        </span>
-        
+<span class="keyword">
+    시민사회
+    <small>3</small>
+</span>
 
-        <span class="keyword">
-            보건
-            <small>1</small>
-        </span>
-        
+
+<span class="keyword">
+    봉사단
+    <small>3</small>
+</span>
+
+
+<span class="keyword">
+    교육
+    <small>2</small>
+</span>
+
+
+<span class="keyword">
+    KCOC
+    <small>2</small>
+</span>
+
+
+<span class="keyword">
+    디지털
+    <small>1</small>
+</span>
+
+
+<span class="keyword">
+    인도적 지원
+    <small>1</small>
+</span>
+
             </div>
         </section>
 
@@ -470,373 +820,373 @@
 
             <ol>
                 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMidEFVX3lxTE9pSUtkTHVuUkpmd2lxdnl5TVFDd2p0SHlOOUhnNGRnWkV1ZDkzRHEwVmh1Mjg3TUxRdHpVZXN3MU10ZTRtYkpSc182ZzF3czZWMGxpQloyeHJNQkJYUTlpS3RWcWgzLWh5Mm9KV0VQaThzVWZ5?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    코이카, 공공데이터 활용 챌린지 성료… 실용성 돋보인 아이디어 대상 - 부산일보
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE1Ha09CQmNZd25kQWV2c21xblREcVNIUUlsM2U2UXJsek9nblZZdGVfZEFYWXRxUlpJbDJ0N3FyYmoybWxONVlWRW4zZlZSMEo1OWR2bmdhdzZPc01fZmFaTdIBYEFVX3lxTE1Ha09CQmNZd25kQWV2c21xblREcVNIUUlsM2U2UXJsek9nblZZdGVfZEFYWXRxUlpJbDJ0N3FyYmoybWxONVlWRW4zZlZSMEo1OWR2bmdhdzZPc01fZmFaTQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        &quot;한국 시민사회, 공적개발원조 공동 설계자&quot;…유엔 무대서 주목 - 연합뉴스
+    </a>
 
-                <div class="article-meta">
-                    부산일보 · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        연합뉴스 · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMidEFVX3lxTFBySEwwOHh4eTlXTU9vRHhSeV9pTzRQM1RhS1VNVUtqd01Nb0dyd2pBaFoyU2xzcTcyc1lkY2tlcFhsWW1PbGhZb2lxMTY0QkkwZ05pQmZzTHBLdFFncVAwZEJfQ0xmUG1fcG51ZmZQblFLbFhL?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    국제개발협력학회, 부산서 2026년 하계학술대회 개최…한국 ODA 전략 방향 모색 - 대한경제
-                </a>
 
-                <div class="article-meta">
-                    대한경제 · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE51dHZuNGJmTzU2SkJKRURwQ0Y1ek5wb2l3Q3NydUl2bVFMb0hhTkJpZGFOdGZKYXZaV0NxRDYzV20zbVRlVS1kZkNWLWxSTjJ0UTZUVzlpdDhqeVdaLXZnZmJrNlJYLWFS?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        한국 NGO, 유엔서 정부 협력모델 소개…국제사회 모범사례로 주목 - 한국NGO신문
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9FSHZRTmI3Y3pMb2NhaWNaTlp1MmpENENLMVBQLVo4TmhtRlg2dHcwLTNSbk5ZU2h3ZVV4YV9Nb3ROSUlOMDBXNjdHZUJkTWZiNXhSdWo3ZnFpd3VLSG1ib21hZ2VvcXNQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    외교부, 개발협력 시민사회와 정책대화 개최 - acn-news.com
-                </a>
+    <div class="article-meta">
+        한국NGO신문 · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    acn-news.com · 정책·ODA
-                </div>
-            </li>
-            
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiW0FVX3lxTE1ad1RRMGhpcFc2Rk9ESDUwdHd4WmhTR3B1QUNIck9xcFlmWTJXaW1UZlJzRVo1WFh1Q0w3cWdBTWRUMTUxNm9vV1h2SDNjc3BQM3F2SGxzS3c2QUnSAWBBVV95cUxOc0FkcWFHejh2NzZaWGdUSE16NTV4S2JubENpS0x5QmVUNHlNNkNLa2lJeFRMaUtsZEY0UUZCbENaMXlZMXBuSU1QNm5hanQtaUxTdUVVZVJKSkxBUGEzZk0?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    국제개발협력학회장에 정헌주 연세대 교수…&quot;파트너십 강화&quot; - 연합뉴스
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9IcjRjZVNfVi1TNXlZREZaSTZCQk5vVElKbkJsWExlWGpaUmVQVUFSZGgwUGREcXlHZ2UzUEktaHlBUUVGWkN5d2lMMDZFVmJTZW5rMnlkLUo2bGdfOWxTT1RWTkhUMlZ5?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        &quot;한국 국제개발협력 시민사회, 유엔 무대에서 새로운 모델로 주목받다&quot; - 공감신문
+    </a>
 
-                <div class="article-meta">
-                    연합뉴스 · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        공감신문 · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE5kMlJOV3ViM1NuMS1qcXZ3eXlDXzUzN0tzUmZpc1puX2xMTjNkbzcxdzc3anhCOXJBcUplX1VLRWp0dXByNS1aRjI5WkF0YVEyN3ZoTnU2dWgyYlo2QmdTbw?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    국제개발협력학회, 부산 동서대서 하계 학술대회 개최 - 메트로신문
-                </a>
 
-                <div class="article-meta">
-                    메트로신문 · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMibEFVX3lxTFA4bzdMSEZlU2ZmWWNucDhLQlZpNzA5S1NZeDZzblJYS2RES1NBTkxodUpCeGRmb3V6UGk2cDFWN1F0cTJablpXSHhSTzktTG5LQ3lYVENPYm9wTVVGTHNLTzJ4dUFDR01lM3NZMg?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        월드비전·KOICA, 개발협력 현장의 갈등 예방·평화구축 역량 높인다 - 뉴스탭
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMibEFVX3lxTFBXdVpMM2ZRQ3NScmVGd0cwRG5OUUtjUzY0QTJTY0prN21GU3EzSXRuRFpfWFRjNUJBbERqcG1MMWhlcjNESFdaazYxVXJyZ1YwZUc0Z0M1QlVtZHZQcDR5SmVLNGE0QlN4TUNLbQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    최빈국 졸업 앞둔 라오스…KOICA, &#x27;지속가능한 자립 모델&#x27; 심는다 - 재외동포신문
-                </a>
+    <div class="article-meta">
+        뉴스탭 · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    재외동포신문 · 정책·ODA
-                </div>
-            </li>
-            
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNUWpmRjJIdkVRUkZ5dHFieUxFbl94em5wQkFiVU5JdHlDbXJKX0xOOGg5bVJSTlRfQUY1bXpseTZOa0JXN0M4Yk5VbU5ucHZsNDZoZmNjN19yN3V6anNYTWhtUWNUT2pOWkU4TEFGVF96N2lWYWFzR1ZFM1MwVkZxZ1RwUy00VmRvZDZuOGw0cGZ6dExZVDJyc3BHMFFQZlJCRUE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    한국 ODA의 전 정부적 조정방안 연구: 주요 공여국 사례를 중심으로 - 한국개발연구원(KDI)
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiT0FVX3lxTFBMaDVET3Q4MFI5RTNWZVFRQm5oWFVfN29XVjc3ZEIxWGNOV3VweDFWcml1dm1QclByaXY2NkJHdzRIZVRWQ0tVWG1la2FJTGs?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        울산과학대학교, 베트남 현지서 ‘울산형 ODA 초급 전문가’ 양성 프로그램 실시 - v.daum.net
+    </a>
 
-                <div class="article-meta">
-                    한국개발연구원(KDI) · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        v.daum.net · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMihgFBVV95cUxQeUhGczJnZzlMWmVVd29pWGFxb2RSV1g0V1FPaHhkRmVlQlBUT3phR2oyTXdDaTZZdVBDVFh2T0VGbExJWFZVTTU5UTlVRm5xYlc0V0xldUFhYjZuQkx0QTMzNURoODFISExVVUtWNTFZVHM0UWNsbUg2cWhlQV9ucExhZUJYQdIBbEFVX3lxTE5xTWhydUpBRlBjdFFDTjkwZjVmYzZTM3lleUtGdHZtOVhBa0xWcVJEd0VEclZyLUxRZFY3b2NvMngyMk5Fay05b3FVTktRR1pKc0xfSUw1NzZOZkw3VGNuWGR3SDcxd0lXY1I2UA?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    베들레헴에 ‘한국 거리’ 생긴다… “ODA 감사 상징” - 국민일보
-                </a>
 
-                <div class="article-meta">
-                    국민일보 · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNUWpmRjJIdkVRUkZ5dHFieUxFbl94em5wQkFiVU5JdHlDbXJKX0xOOGg5bVJSTlRfQUY1bXpseTZOa0JXN0M4Yk5VbU5ucHZsNDZoZmNjN19yN3V6anNYTWhtUWNUT2pOWkU4TEFGVF96N2lWYWFzR1ZFM1MwVkZxZ1RwUy00VmRvZDZuOGw0cGZ6dExZVDJyc3BHMFFQZlJCRUE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        한국 ODA의 전 정부적 조정방안 연구: 주요 공여국 사례를 중심으로 - KDI 경제교육
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMigAFBVV95cUxNMlhJVDZRZmxqa085LS1yUVBmQTRlQktZV0R2RF9Fc0xiVjhLMGJ0bG1EdS1kZjI2XzZOSy1uVU54azEtWnB2NnkxVWIzZnBFM1JzczFTTzNqMXh1UmxlVkxCcjF6WEdnZWhCd1kteU1pNDl0T1gyVEVxN1JxMnp3Rg?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    한국, 파키스탄 문화유산 보존 돕는다…98억 원 규모 ODA 사업 - 이데일리
-                </a>
+    <div class="article-meta">
+        KDI 경제교육 · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    이데일리 · 정책·ODA
-                </div>
-            </li>
-            
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiW0FVX3lxTE9FelVGb05zUXFSeVowMXhJS0VnTEZ4NmxFRlFZVmNyWXBnbGtXcmdvQV9md0VkeGd1N1R1NEVsX1pQQlhMZHItWThBZmZfLTEteUxVb2JCTlZ0QjTSAWBBVV95cUxQNm1aX3hxUkFITC1vV2NDUkVnZVZZWDluY0RHcHROaWtDTzhqbG9NY0d1Rl9SenlwcHpuYWdJcExUTG9zWEFvZ19DX1pLZ3Y4MXo5Wm5UbEtQY3VBYkpFcU4?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    팔레스타인에 &#x27;코리아 스트리트&#x27; 생긴다 - 연합뉴스
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiZkFVX3lxTE1iRkVwQzMydlFsMzNFbU1WZjBxSGJjenRLMVdTTElsaUJnNXVtTDBHWjBUM2Y2QUNYSWZYMEJtemhHV0ZvMWtKMVE4aWlEelRhRkVLLWVlUnJPZGdRT0xKNlJLbWpydw?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        동서대-외교부, 글로벌 원조 재편 속 한국 ODA의 전략 방향과 협력 모델 논의 - 한국대학신문
+    </a>
 
-                <div class="article-meta">
-                    연합뉴스 · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        한국대학신문 · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiT0FVX3lxTE54M2tUREZId1pSTU43ZEQ5SjhyUHpkamhwZjRYRXZzX0JydG04N21QR2dzMmUtQ0RIMS0yX1BpbDdKTHBvNXZ1RFE0Unc2aHc?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    코이카, 팔레스타인 청년 창업·재난 대응 종합 지원 나선다 - v.daum.net
-                </a>
 
-                <div class="article-meta">
-                    v.daum.net · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMibEFVX3lxTFBXdVpMM2ZRQ3NScmVGd0cwRG5OUUtjUzY0QTJTY0prN21GU3EzSXRuRFpfWFRjNUJBbERqcG1MMWhlcjNESFdaazYxVXJyZ1YwZUc0Z0M1QlVtZHZQcDR5SmVLNGE0QlN4TUNLbQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        최빈국 졸업 앞둔 라오스…KOICA, &#x27;지속가능한 자립 모델&#x27; 심는다 - 재외동포신문
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiW0FVX3lxTFBZd0Y2U1VsMHNVenB0WktSeW5mbnptNGtvR0RfdlZsdFo4SWRYZGJUanpMb0ZlVlZGQkQ4WGlYM1JaSkFhZS11OElMQUVaaFR3TkZONXY5cUxpMm_SAWBBVV95cUxNRXdwZ1ptMHZoOVdQY1g4X21jZ0hWTEk2TjNiRk55SUJNcWFQM0Z1c1A0cmtOWWVTZm1xNkdWVHgycFVvWEJEU2ZLWDl2czl6UzREaTN6dl9zZnNQZkRHUzA?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    &#x27;신규사업 위험요소 사전 진단&#x27;…코이카 공공데이터 챌린지 대상 - 연합뉴스
-                </a>
+    <div class="article-meta">
+        재외동포신문 · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    연합뉴스 · 정책·ODA
-                </div>
-            </li>
-            
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMibkFVX3lxTE12d3pCR0FRS0I2NHM3ZjVyaVo1YVpOVHU3bzFZenpGS3VLVWdncmRJdG03U3dFdXZCVTNkVm5qdUZSRy1zWkQ4VE5pX244SE1jcDFuZWJzME1TQzVaRTNDcmlwOEVxSm5zeTdtSy13?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    청주대, KOICA 피지 보건당국 초청 연수 운영 - gukjenews.com
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMi5gJBVV95cUxQMWhqTmNDQWswQTFRUEZEelpPS19OS1F4ZVJSVXh6N2lBMjV6Y01EcGFIMnQ4YTJBQ1RlcExCdHZPcWdDSHhoUVhPLUZIdTYzME1Gbi1mcDMtTkZRVzlVRWluNWJ5UXg3T2lIc0dLTU0tU0ZxZWs4S3pKcnV5RHNpSll3T0Yxd1dOWmpRS3hqMmNDaUhIcmJNOFVHX2xTd3I1dHlaQ1Q5WUhxNjk3ZnZJdnhPVWNxX3VJakE5U3hzTklISG0xbENudS0tWDJPcm93T3lYZkxPTW1pd21EaEtxT19xUWJxaHBTTnlpWGl4SFJCVWo3V0YyWUtvTTllSlRKczdnZ0pzUW5xbjhvenU3OWZFWkZ4eXlsTTAzM3Uxbll6RnUtbFppUHpqMWQzVUIwM1o1clBIN083Q0dGVE9Sd3BSUlRFOHVZT1dGOUstYTM4dUVQZ3FzNGxBZ0p2OGZiQ2xYNmFn?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        베들레헴에 &#x27;한국로&#x27; 생겼다…코이카, 팔레스타인 ODA 확대 - MSN
+    </a>
 
-                <div class="article-meta">
-                    gukjenews.com · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        MSN · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMieEFVX3lxTE5FY0JZVmExcTM4ZERfeTFoMDBYbVRvZ2lMMlhyekVic0tjTzZJallNNC1naUdaVk4tWGxyX0x1UHNQRnRaTkI4bE9lX0ZIMjkyeEZubVhBYlNjRVNvUDdJX2ZjbDYxcXZDSTQ3bGc3ekIyZVhoN3c5Tg?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    코이카, 팔레스타인 청년창업·재난대응 지원 사업 추진 - 로이슈
-                </a>
 
-                <div class="article-meta">
-                    로이슈 · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiRkFVX3lxTFBmOFVOU2FPR3hndklTX0s4MU1oT1J4djd0Si11Y3FTSHN1Uy05UzBPd2hyYnM4dnNkbHVVRm5tYl8wYktlVFE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        국제개발협력학회, 하계학술대회 부산서 개최...한국 ODA 질적 도약 논의 - v.daum.net
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE5IZTV4RjZhWkxnQnpLbkViQnR5MTBXUTBjdEZGZmw5SkZUTEVCTU5PNC1XRnlMa3RfcGRyYzVGanAxYUo5akF3UWZLOUphLXhmcFRV?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    베들레헴에 &#x27;한국로&#x27; 생겼다…코이카, 팔레스타인 ODA 확대 - 네이트
-                </a>
+    <div class="article-meta">
+        v.daum.net · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    네이트 · 정책·ODA
-                </div>
-            </li>
-            
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFA1SFRkMjlLczNzemVaVWhCX3prUmttQ2l0cVViVHhKa25NRjJJbV9fMk1xcEx3dFBkYnlwaTMyaFRJQVQ0Rl9rM3YzRXBuS1VvYmMtMTJ4MDI3MldnNzhiMnBiSm4waS1o?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    KCOC, WFK KOICA-NGO봉사단 성과공유회 개최…20개국 91명 활동 성과 공유 - 한국NGO신문
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMia0FVX3lxTFBiUUFzZEtRejZlTVNCalBBRTM1NGQ0OUh6Qm1Hb000MGQ0UE9xWkd6NDN0dTBDSUV6ZkNtbHJXRU5yLUk0bEsxTUVzYVNtLTBZM0ZkYUVISEd4RmVQa3owNUE3dDZSdzFHNngw?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        유비온, KOICA 지원 우즈베키스탄 간호교육 디지털 전환 사업 추진 - 한경매거진&amp;북
+    </a>
 
-                <div class="article-meta">
-                    한국NGO신문 · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        한경매거진&amp;북 · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiRkFVX3lxTFBPX1J3d3pRZkxNcjI5Y09sUWkwQzRaUVQ4SnBZcTQ3VHhQV2l4SElJQ3NFSVF0Z0FOX1h0Vm4yUi1pb1pRemc?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    KCOC, ‘2024-2026 월드프렌즈코리아 KOICA-NGO봉사단’ 성과공유회 성료 - 동아경제
-                </a>
 
-                <div class="article-meta">
-                    동아경제 · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE91cFdmVHRLLU9ZUEdLU2xUd2pjT2V5aTEteVVkTDAxYlFhWUtFS3dnZXdnY3BTM1FXZEpxdEtiOUZxOG1HUmdVNjVGNUlZMTFDUzk5TlBGcHhDLW1aN2k3atIBeEFVX3lxTE9HMkFVM3UtY1JqZnVoa2lZM1Q1WVhqbTRYeUk5TW5ab2VfcFdmWGtSWDVVdDc1T3RnNDJScElCdlVKaFRDSFVFTGRCb2xZVVlEVXpPUWN5dEhNV203dUxpZmxtcVU4bU04OWFVcXRVREhiVXNuOHFxUw?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        KCL, 태국 &#x27;전기전자산업 탄소중립역량 지원&#x27; 연수 성료 - 뉴시스
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMibkFVX3lxTFA3RDh0M1NYeFFSUkp3ME9TVjlQd1pObERua0c4OGVxUk1ZNGR1bmlmSzFSZEE1Vk5FaHJnbFB6aHdZN1pETmtkTldwSmJOdGZUaXY0M2xRTEpQOEdyNXFza0ZFS2NySlNWUHdXcUx3?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    국제개발협력 NGO 봉사단 성과공유회 개최…20개국 현장 경험 나눠 - gukjenews.com
-                </a>
+    <div class="article-meta">
+        뉴시스 · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    gukjenews.com · 정책·ODA
-                </div>
-            </li>
-            
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiW0FVX3lxTFA5YndCZDlwMXVUc0JQUTJ1Um0zcERPY21nYXRZYlZKX3JsZnlvWGE3aXluN3BvMFNFWjlMVUlNSXVQSEp4eENlTHRQU1R1QWVJNDRHUDFLNVFSTUXSAWBBVV95cUxOSnRySGp0MGNKS0Yzcm02NGJkV1h3Sjl5emF3WUtkSmZYWWlzWVIybXpzdl9MeVV6cVU3ZUdDb2Z3UzNTbXEwNUJyYl9WUFNWVkVqaWpGNG1wUDNaMGVJSWc?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    율촌·온율·호이·헤퍼코리아·기아대책, 국제개발협력상 수상 - 연합뉴스
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMijAFBVV95cUxQU2tSaE95eGJMVFJ6TFJTeGtXT0tadmFBZTZONUhMNHhpcnZhZ3EzWkQtcDR0d01vVGpldEVaYkNHd3ZtU1FpLWFBbHlKelh0MmVIWFdhVGt2RHp2QnVYTGNyVW5uMm5WWUlQdnhoTDdXNllGWWxuTVRja3JTWnhOTGRIcFJYSk1rU1VFbw?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        우리 지역에서 만난 넓은 세상, KOICA 개발협력전시관 - 경기도뉴스포털
+    </a>
 
-                <div class="article-meta">
-                    연합뉴스 · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        경기도뉴스포털 · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE9kSG1HUDRPX2lONkk4LV84S0JrTlJDT3AwUXVuMmRRRWY5Nmc4WFU5V2kzbGQ1ZDd6Y2tKOWF2TGVWRXI0QUhSVmFhdTZIVzk3RlE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    [사회혁신발언대] 위기 현장에서 배운 인도주의 가치, 한국 국제개발협력의 중심이 되어야 한다 - 더나은미래
-                </a>
 
-                <div class="article-meta">
-                    더나은미래 · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMidEFVX3lxTE9pSUtkTHVuUkpmd2lxdnl5TVFDd2p0SHlOOUhnNGRnWkV1ZDkzRHEwVmh1Mjg3TUxRdHpVZXN3MU10ZTRtYkpSc182ZzF3czZWMGxpQloyeHJNQkJYUTlpS3RWcWgzLWh5Mm9KV0VQaThzVWZ5?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        코이카, 공공데이터 활용 챌린지 성료… 실용성 돋보인 아이디어 대상 - 부산일보
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMibEFVX3lxTE9oaWRVcFJ3LVhiVWV6djJZM1FOSW95Q055MjVQSk1kOEhuSkhPczlZNDJfaG9JMXlQYTRXUUNnSXlpT1BQUFhGOFA0WDhnczhrUUtCYW1CMXdqbmpheFUtcU0xUjEwMWdCLUx1MA?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    이화여대 NGO-기업 매칭데이 성료 .. &#x27;21개 NGO, 24개 기업/스타트업 등 참여&#x27; - 베리타스알파
-                </a>
+    <div class="article-meta">
+        부산일보 · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    베리타스알파 · 정책·ODA
-                </div>
-            </li>
-            
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMicEFVX3lxTE8wS0JITWVZSDU0NWtlRXVfYXlELW5GaThpbWJGWkdnTTlTbXJkM0JVWVRmNFZBeU9tV2l1X1lXQXp1VjFCcE5mMWtEMVV3LUQ4akwxMlR1aDRZZk5FZHJ5SGFMSFl6QkF4RHEwMmVTaFI?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    &quot;현장 아는 NGO와 기술 가진 기업 만나니&quot;… 이화여대, 글로벌 상생 모델 판 깔았다 - 스마트경제
-                </a>
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiS0FVX3lxTE5TWUxhci1qd2J0cHEtbG95SXRKTVhjbDIwZlFVQlhSSW54Y2U3T2R1bjVuOXhKSnZfbkprX0ZkN0FXajFMaG9ZMVloVQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        외교부, 시민사회와 인도적 지원 협력·KOICA 사업 참여 확대 논의 - v.daum.net
+    </a>
 
-                <div class="article-meta">
-                    스마트경제 · 정책·ODA
-                </div>
-            </li>
-            
+    <div class="article-meta">
+        v.daum.net · 정책·ODA
+    </div>
+</li>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE1HZjMxZmtUbTJhaTRhY3lrdGdRRkdnMlpjU0N1YUo3WFhZTTVYMVBIeTJFcVBoNEsyNHhRZDNmTWs2NmVQS0hmSjllTE5ZTDRQWlE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    KCOC, 2025 국제개발협력 NGO 책무성 자가진단 결과 공개 - 더나은미래
-                </a>
 
-                <div class="article-meta">
-                    더나은미래 · 정책·ODA
-                </div>
-            </li>
-            
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFA1SFRkMjlLczNzemVaVWhCX3prUmttQ2l0cVViVHhKa25NRjJJbV9fMk1xcEx3dFBkYnlwaTMyaFRJQVQ0Rl9rM3YzRXBuS1VvYmMtMTJ4MDI3MldnNzhiMnBiSm4waS1o?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        KCOC, WFK KOICA-NGO봉사단 성과공유회 개최…20개국 91명 활동 성과 공유 - 한국NGO신문
+    </a>
 
-            <li>
-                <a
-                    href="https://news.google.com/rss/articles/CBMic0FVX3lxTE4zMHl0YWhQVTBwcnROTEw5b2pwd19TQXBhaW54cXQzSXFmMG5sbzVMbFRxZTc5UjJkWm11dFlxR2FCUlIyS214RDBwVlZCWmt4RDE0SlRieGg0aUxSV2RfdGlfNWdEYzRsMDdsdVNrWHJQOG_SAXdBVV95cUxPTmJnRElkSzd1V2k3aDFQajAxOWpoM2Q2dEhIMjFjRkZiMGFQMU00NzlOWG5xZzY5S0tUQmhLUFhVLWRHUkpMaEZ3VGxoRk5zV2laWVdyTmJRSnIyOE9BSG15R0xjbmQwckRTR0M4VF9BR0xGU2VOaw?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    이화여대, NGO-기업 매칭데이 개최 - 핀포인트뉴스
-                </a>
+    <div class="article-meta">
+        한국NGO신문 · 정책·ODA
+    </div>
+</li>
 
-                <div class="article-meta">
-                    핀포인트뉴스 · 정책·ODA
-                </div>
-            </li>
-            
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiRkFVX3lxTFBPX1J3d3pRZkxNcjI5Y09sUWkwQzRaUVQ4SnBZcTQ3VHhQV2l4SElJQ3NFSVF0Z0FOX1h0Vm4yUi1pb1pRemc?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        KCOC, ‘2024-2026 월드프렌즈코리아 KOICA-NGO봉사단’ 성과공유회 성료 - 동아경제
+    </a>
+
+    <div class="article-meta">
+        동아경제 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMibkFVX3lxTFA3RDh0M1NYeFFSUkp3ME9TVjlQd1pObERua0c4OGVxUk1ZNGR1bmlmSzFSZEE1Vk5FaHJnbFB6aHdZN1pETmtkTldwSmJOdGZUaXY0M2xRTEpQOEdyNXFza0ZFS2NySlNWUHdXcUx3?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        국제개발협력 NGO 봉사단 성과공유회 개최…20개국 현장 경험 나눠 - gukjenews.com
+    </a>
+
+    <div class="article-meta">
+        gukjenews.com · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE9kSG1HUDRPX2lONkk4LV84S0JrTlJDT3AwUXVuMmRRRWY5Nmc4WFU5V2kzbGQ1ZDd6Y2tKOWF2TGVWRXI0QUhSVmFhdTZIVzk3RlE?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        [사회혁신발언대] 위기 현장에서 배운 인도주의 가치, 한국 국제개발협력의 중심이 되어야 한다 - 더나은미래
+    </a>
+
+    <div class="article-meta">
+        더나은미래 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiT0FVX3lxTE02ZUZJLWxrZlBlTEZIUW41SmhuVmFMNGEtaFNnYnZmdkFDYW82M0o3NzZVM05yOEg3Vi0wOVhIbE5Td1B5RWpNa2RvYnR3UUU?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        &quot;정부 공적개발원조(ODA), 국익·가시성 원조에 머물러선 안 돼&quot; - v.daum.net
+    </a>
+
+    <div class="article-meta">
+        v.daum.net · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMibEFVX3lxTE9oaWRVcFJ3LVhiVWV6djJZM1FOSW95Q055MjVQSk1kOEhuSkhPczlZNDJfaG9JMXlQYTRXUUNnSXlpT1BQUFhGOFA0WDhnczhrUUtCYW1CMXdqbmpheFUtcU0xUjEwMWdCLUx1MA?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        이화여대 NGO-기업 매칭데이 성료 .. &#x27;21개 NGO, 24개 기업/스타트업 등 참여&#x27; - 베리타스알파
+    </a>
+
+    <div class="article-meta">
+        베리타스알파 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiW0FVX3lxTFA5YndCZDlwMXVUc0JQUTJ1Um0zcERPY21nYXRZYlZKX3JsZnlvWGE3aXluN3BvMFNFWjlMVUlNSXVQSEp4eENlTHRQU1R1QWVJNDRHUDFLNVFSTUXSAWBBVV95cUxOSnRySGp0MGNKS0Yzcm02NGJkV1h3Sjl5emF3WUtkSmZYWWlzWVIybXpzdl9MeVV6cVU3ZUdDb2Z3UzNTbXEwNUJyYl9WUFNWVkVqaWpGNG1wUDNaMGVJSWc?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        율촌·온율·호이·헤퍼코리아·기아대책, 국제개발협력상 수상 - 연합뉴스
+    </a>
+
+    <div class="article-meta">
+        연합뉴스 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFBLeGthMzBCLUdoVlVhd0FmLWpkaldjWHAyQlRZRG1yMVNLcktwWXFCZFR2MlRXbXlnLWNPdDQxR1VoSUw1c0VlTjRKaUF4bVNTSms1LUtuRWwyLTdFU00zZtIBeEFVX3lxTE10cXNjT2RueUUzdURFalBnaUVHQXRHQjJPRWJpY1BQQ0Vld3dlYW5jMnd1ckJVaDkyUXN3cXlyc050SDdFOTdKNWN4dFNMRkwtSFlqMzdlNUFRc0ZlbTIxcVJ3NFBwOVAyUENadnp5Smw1ZndoYWRfbQ?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        이화여대, &#x27;NGO-기업 매칭데이&#x27; 성료…협력 모델 모색 - 뉴시스
+    </a>
+
+    <div class="article-meta">
+        뉴시스 · 정책·ODA
+    </div>
+</li>
+
+
+<li>
+    <a
+        href="https://news.google.com/rss/articles/CBMicEFVX3lxTE8wS0JITWVZSDU0NWtlRXVfYXlELW5GaThpbWJGWkdnTTlTbXJkM0JVWVRmNFZBeU9tV2l1X1lXQXp1VjFCcE5mMWtEMVV3LUQ4akwxMlR1aDRZZk5FZHJ5SGFMSFl6QkF4RHEwMmVTaFI?oc=5&amp;hl=en-US&amp;gl=US&amp;ceid=US:en"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        &quot;현장 아는 NGO와 기술 가진 기업 만나니&quot;… 이화여대, 글로벌 상생 모델 판 깔았다 - 스마트경제
+    </a>
+
+    <div class="article-meta">
+        스마트경제 · 정책·ODA
+    </div>
+</li>
+
             </ol>
         </section>
 
         <p class="notice">
             본 브리핑은 기사 본문에서 핵심 문장을 자동 선별한
             추출형 요약입니다. 언론사 접근 제한이나 페이지 구조에
-            따라 일부 기사는 RSS 설명 또는 기사 제목을 기준으로
-            표시될 수 있습니다. 중요한 내용은 원문과 공식 발표를
+            따라 일부 기사는 RSS 설명 또는 안내 문구로 표시될 수
+            있습니다. 중요한 내용은 원문과 관계기관의 공식 발표를
             함께 확인하시기 바랍니다.
         </p>
     </main>
