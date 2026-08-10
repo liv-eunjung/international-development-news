@@ -109,8 +109,8 @@ def create_readme(news_data: dict[str, list[dict[str, str]]]) -> str:
 
         for article in articles:
             lines.append(
-                f"- [{article['title']}]({article['link']})  "
-                f"  \n  출처: {article['source']}"
+                f"- [{article['title']}]({article['link']})"
+                f" — {article['source']}"
             )
             total_articles += 1
 
