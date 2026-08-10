@@ -872,6 +872,15 @@ def render_article_card(
         )
     )
 
+    published = format_published_date(
+        str(
+            article.get(
+                "published",
+                "",
+            )
+        )
+    )
+
     summary = article.get(
         "summary",
         [],
@@ -893,8 +902,6 @@ def render_article_card(
             f"<ul>{items}</ul>"
         )
 
-    # 핵심:
-    # 기사 제목 자체가 클릭 가능한 링크입니다.
     return f"""
 <article class="news-summary">
 
@@ -912,7 +919,7 @@ def render_article_card(
     {summary_html}
 
     <div class="summary-source">
-        출처: {source}
+        {source} · {published}
     </div>
 
 </article>
