@@ -81,49 +81,62 @@ def collect_news() -> dict[str, list[dict[str, str]]]:
 
 
 def create_readme(news_data: dict[str, list[dict[str, str]]]) -> str:
-    """수집 결과를 README 마크다운으로 만듭니다."""
+    """수집 결과를 카테고리별 뉴스 목록으로 README에 표시합니다."""
     now = datetime.now(KST)
 
     lines = [
         "# 🌍 한국 국제개발협력 동향 뉴스",
         "",
         "한국 국제개발협력, ODA, NGO, 해외봉사 및 인도적 지원 관련 "
-        "최신 뉴스를 자동 수집합니다.",
+        "최신 뉴스를 자동으로 수집합니다.",
         "",
         f"> 최근 업데이트: **{now:%Y-%m-%d %H:%M} KST**",
         "",
-        "## 오늘의 뉴스",
+        "---",
         "",
     ]
 
     total_articles = 0
 
     for keyword, articles in news_data.items():
-        lines.append(f"### {keyword}")
+
+        # 카테고리 제목
+        lines.append(f"## ● {keyword}")
         lines.append("")
 
         if not articles:
-            lines.append("- 수집된 기사가 없습니다.")
+            lines.append("수집된 기사가 없습니다.")
             lines.append("")
             continue
 
         for article in articles:
+
+            title = article["title"]
+            link = article["link"]
+            source = article["source"]
+
+            # 기사 제목 자체에 링크 연결
             lines.append(
-                f"- [{article['title']}]({article['link']})"
-                f" — {article['source']}"
+                f"### [{title}]({link})"
             )
+
+            # 출처 표시
+            lines.append(
+                f"<sub>출처: {source}</sub>"
+            )
+
+            lines.append("")
             total_articles += 1
 
+        lines.append("---")
         lines.append("")
 
     lines.extend(
         [
-            "---",
-            "",
             f"총 수집 기사: **{total_articles}건**",
             "",
-            "※ 본 페이지는 RSS 검색 결과를 자동 수집합니다. "
-            "기사의 정확한 내용은 원문에서 확인하세요.",
+            "※ 본 페이지는 Google News RSS 검색 결과를 자동으로 수집합니다. "
+            "기사 제목을 클릭하면 해당 기사로 이동합니다.",
             "",
         ]
     )
