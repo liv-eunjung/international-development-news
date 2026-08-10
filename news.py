@@ -42,6 +42,27 @@ HEADERS = {
 
 
 CATEGORY_RULES = {
+    "해외봉사": [
+        "해외봉사",
+        "봉사단",
+        "volunteer",
+        "wfk",
+        "월드프렌즈",
+        "peace corps",
+        "청년인턴",
+        "글로벌인재",
+        "인재양성",
+    ],
+    "NGO·시민사회": [
+        "ngo",
+        "시민사회",
+        "kcoc",
+        "비정부기구",
+        "비영리",
+        "민간단체",
+        "국제구호",
+        "시민단체",
+    ],
     "정책·ODA": [
         "oda",
         "공적개발원조",
@@ -56,27 +77,6 @@ CATEGORY_RULES = {
         "무상원조",
         "유상원조",
         "개발재원",
-    ],
-    "NGO·시민사회": [
-        "ngo",
-        "시민사회",
-        "kcoc",
-        "비정부기구",
-        "비영리",
-        "민간단체",
-        "국제구호",
-        "시민단체",
-    ],
-    "해외봉사": [
-        "해외봉사",
-        "봉사단",
-        "volunteer",
-        "wfk",
-        "월드프렌즈",
-        "peace corps",
-        "청년인턴",
-        "글로벌인재",
-        "인재양성",
     ],
     "인도적 지원": [
         "인도적 지원",
@@ -148,30 +148,104 @@ ORGANIZATION_RULES = {
 
 
 COUNTRY_RULES = {
-    "대한민국": ["한국", "대한민국", "코리아"],
-    "캄보디아": ["캄보디아", "cambodia"],
-    "르완다": ["르완다", "rwanda"],
-    "우간다": ["우간다", "uganda"],
-    "페루": ["페루", "peru"],
-    "케냐": ["케냐", "kenya"],
-    "에티오피아": ["에티오피아", "ethiopia"],
-    "라오스": ["라오스", "laos"],
-    "베트남": ["베트남", "vietnam"],
-    "필리핀": ["필리핀", "philippines"],
-    "몽골": ["몽골", "mongolia"],
-    "네팔": ["네팔", "nepal"],
-    "방글라데시": ["방글라데시", "bangladesh"],
-    "스리랑카": ["스리랑카", "sri lanka"],
-    "인도네시아": ["인도네시아", "indonesia"],
-    "탄자니아": ["탄자니아", "tanzania"],
-    "가나": ["가나", "ghana"],
-    "세네갈": ["세네갈", "senegal"],
-    "모로코": ["모로코", "morocco"],
-    "요르단": ["요르단", "jordan"],
-    "우크라이나": ["우크라이나", "ukraine"],
-    "팔레스타인": ["팔레스타인", "palestine", "가자"],
-    "수단": ["수단", "sudan"],
-    "미얀마": ["미얀마", "myanmar"],
+    "대한민국": [
+        "한국",
+        "대한민국",
+        "코리아",
+    ],
+    "캄보디아": [
+        "캄보디아",
+        "cambodia",
+    ],
+    "르완다": [
+        "르완다",
+        "rwanda",
+    ],
+    "우간다": [
+        "우간다",
+        "uganda",
+    ],
+    "페루": [
+        "페루",
+        "peru",
+    ],
+    "케냐": [
+        "케냐",
+        "kenya",
+    ],
+    "에티오피아": [
+        "에티오피아",
+        "ethiopia",
+    ],
+    "라오스": [
+        "라오스",
+        "laos",
+    ],
+    "베트남": [
+        "베트남",
+        "vietnam",
+    ],
+    "필리핀": [
+        "필리핀",
+        "philippines",
+    ],
+    "몽골": [
+        "몽골",
+        "mongolia",
+    ],
+    "네팔": [
+        "네팔",
+        "nepal",
+    ],
+    "방글라데시": [
+        "방글라데시",
+        "bangladesh",
+    ],
+    "스리랑카": [
+        "스리랑카",
+        "sri lanka",
+    ],
+    "인도네시아": [
+        "인도네시아",
+        "indonesia",
+    ],
+    "탄자니아": [
+        "탄자니아",
+        "tanzania",
+    ],
+    "가나": [
+        "가나",
+        "ghana",
+    ],
+    "세네갈": [
+        "세네갈",
+        "senegal",
+    ],
+    "모로코": [
+        "모로코",
+        "morocco",
+    ],
+    "요르단": [
+        "요르단",
+        "jordan",
+    ],
+    "우크라이나": [
+        "우크라이나",
+        "ukraine",
+    ],
+    "팔레스타인": [
+        "팔레스타인",
+        "palestine",
+        "가자",
+    ],
+    "수단": [
+        "수단",
+        "sudan",
+    ],
+    "미얀마": [
+        "미얀마",
+        "myanmar",
+    ],
 }
 
 
@@ -263,62 +337,110 @@ def google_news_rss_url(keyword: str) -> str:
 
 
 def clean_text(value: str) -> str:
-def format_published_date(published: str) -> str:
-    """Google News RSS 게시일을 YYYY.MM.DD 형식으로 변환합니다."""
+    value = html.unescape(value or "")
+
+    value = re.sub(
+        r"<[^>]+>",
+        " ",
+        value,
+    )
+
+    value = (
+        value.replace("\n", " ")
+        .replace("\r", " ")
+        .replace("\xa0", " ")
+    )
+
+    return re.sub(
+        r"\s+",
+        " ",
+        value,
+    ).strip()
+
+
+def format_published_date(
+    published: str,
+) -> str:
+    """RSS 게시일을 한국시간 기준 YYYY.MM.DD 형식으로 변환합니다."""
 
     if not published:
         return "게시일 미확인"
 
-    try:
-        parsed = datetime.strptime(
-            published,
-            "%a, %d %b %Y %H:%M:%S %Z",
-        )
+    formats = [
+        "%a, %d %b %Y %H:%M:%S %Z",
+        "%a, %d %b %Y %H:%M:%S %z",
+    ]
 
-        parsed = parsed.replace(
-            tzinfo=timezone.utc
-        ).astimezone(KST)
+    for fmt in formats:
+        try:
+            parsed = datetime.strptime(
+                published,
+                fmt,
+            )
 
-        return parsed.strftime(
-            "%Y.%m.%d"
-        )
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(
+                    tzinfo=timezone.utc
+                )
 
-    except ValueError:
-        pass
+            parsed = parsed.astimezone(
+                KST
+            )
 
-    # 일부 RSS에서 timezone 표기가 다른 경우 대비
-    try:
-        parsed = datetime.strptime(
-            published,
-            "%a, %d %b %Y %H:%M:%S %z",
-        )
+            return parsed.strftime(
+                "%Y.%m.%d"
+            )
 
-        parsed = parsed.astimezone(
-            KST
-        )
+        except ValueError:
+            continue
 
-        return parsed.strftime(
-            "%Y.%m.%d"
-        )
+    return "게시일 미확인"
 
-    except ValueError:
-        return "게시일 미확인"
+
+def normalize_title(
+    title: str,
+) -> str:
+    normalized = title.lower()
+
+    normalized = re.sub(
+        r"\s*-\s*[^-]+$",
+        "",
+        normalized,
+    )
+
+    normalized = re.sub(
+        r"[^가-힣a-z0-9]",
+        "",
+        normalized,
+    )
+
+    return normalized
 
 
 def collect_news() -> list[dict[str, str]]:
-    articles = []
-    seen_titles = set()
+    articles: list[
+        dict[str, str]
+    ] = []
+
+    seen_titles: set[
+        str
+    ] = set()
 
     for keyword in SEARCH_KEYWORDS:
         feed = feedparser.parse(
-            google_news_rss_url(keyword)
+            google_news_rss_url(
+                keyword
+            )
         )
 
         keyword_count = 0
 
         for entry in feed.entries:
             title = clean_text(
-                entry.get("title", "")
+                entry.get(
+                    "title",
+                    "",
+                )
             )
 
             link = entry.get(
@@ -380,10 +502,16 @@ def collect_news() -> list[dict[str, str]]:
 
             keyword_count += 1
 
-            if keyword_count >= MAX_ARTICLES_PER_KEYWORD:
+            if (
+                keyword_count
+                >= MAX_ARTICLES_PER_KEYWORD
+            ):
                 break
 
-            if len(articles) >= MAX_TOTAL_ARTICLES:
+            if (
+                len(articles)
+                >= MAX_TOTAL_ARTICLES
+            ):
                 return articles
 
     return articles
@@ -440,7 +568,9 @@ def split_sentences(
     text: str,
 ) -> list[str]:
 
-    text = clean_text(text)
+    text = clean_text(
+        text
+    )
 
     sentences = re.split(
         r"(?<=[.!?。！？])\s+",
@@ -510,11 +640,16 @@ def summary_is_duplicate_of_title(
     if longer == 0:
         return False
 
-    if shorter / longer >= 0.85:
-        if summary_key in title_key:
-            return True
-
-        if title_key in summary_key:
+    if (
+        shorter / longer
+        >= 0.85
+    ):
+        if (
+            summary_key
+            in title_key
+            or title_key
+            in summary_key
+        ):
             return True
 
     return False
@@ -527,7 +662,10 @@ def summarize_text(
     sentence_count: int = 3,
 ) -> list[str]:
 
-    source_text = text or fallback
+    source_text = (
+        text
+        or fallback
+    )
 
     sentences = split_sentences(
         source_text
@@ -555,13 +693,16 @@ def summarize_text(
         )
 
         normalized_frequencies = {
-            word: count / max_frequency
+            word:
+            count / max_frequency
             for word, count
             in frequencies.items()
         }
 
         title_words = set(
-            tokenize(title)
+            tokenize(
+                title
+            )
         )
 
         scored_sentences = []
@@ -581,15 +722,18 @@ def summarize_text(
                     word,
                     0,
                 )
-                for word in words
+                for word
+                in words
             ) / math.sqrt(
                 len(words)
             )
 
             title_score = sum(
                 1
-                for word in words
-                if word in title_words
+                for word
+                in words
+                if word
+                in title_words
             )
 
             position_score = max(
@@ -613,7 +757,8 @@ def summarize_text(
 
         selected = sorted(
             scored_sentences,
-            key=lambda item: item[1],
+            key=lambda item:
+            item[1],
             reverse=True,
         )[
             :sentence_count
@@ -621,7 +766,8 @@ def summarize_text(
 
         selected = sorted(
             selected,
-            key=lambda item: item[0],
+            key=lambda item:
+            item[0],
         )
 
         candidates = [
@@ -632,7 +778,8 @@ def summarize_text(
 
     cleaned = [
         sentence
-        for sentence in candidates
+        for sentence
+        in candidates
         if not summary_is_duplicate_of_title(
             sentence,
             title,
@@ -652,8 +799,10 @@ def contains_any(
     lowered = text.lower()
 
     return any(
-        keyword.lower() in lowered
-        for keyword in keywords
+        keyword.lower()
+        in lowered
+        for keyword
+        in keywords
     )
 
 
@@ -670,8 +819,11 @@ def classify_category(
 
     scores = {
         category: sum(
-            keyword.lower() in text
-            for keyword in keywords
+            1
+            for keyword
+            in keywords
+            if keyword.lower()
+            in text
         )
         for category, keywords
         in CATEGORY_RULES.items()
@@ -686,17 +838,20 @@ def classify_category(
         return "정책·ODA"
 
     priority = [
-        "인도적 지원",
         "해외봉사",
         "NGO·시민사회",
         "정책·ODA",
+        "인도적 지원",
     ]
 
     for category in priority:
-        if scores.get(
-            category,
-            0,
-        ) == best_score:
+        if (
+            scores.get(
+                category,
+                0,
+            )
+            == best_score
+        ):
             return category
 
     return "정책·ODA"
@@ -712,21 +867,33 @@ def detect_organization(
         f"{article['description']}"
     )
 
-    for organization, keywords in ORGANIZATION_RULES.items():
+    for (
+        organization,
+        keywords,
+    ) in ORGANIZATION_RULES.items():
+
         if contains_any(
             text,
             keywords,
         ):
             return organization
 
-    if article["source"] != "출처 미확인":
-        return article["source"]
+    if (
+        article["source"]
+        != "출처 미확인"
+    ):
+        return article[
+            "source"
+        ]
 
     return "기타 기관"
 
 
 def detect_countries(
-    article: dict[str, object],
+    article: dict[
+        str,
+        object,
+    ],
 ) -> list[str]:
 
     text = (
@@ -737,10 +904,16 @@ def detect_countries(
 
     countries = []
 
-    for country, keywords in COUNTRY_RULES.items():
+    for (
+        country,
+        keywords,
+    ) in COUNTRY_RULES.items():
+
         if any(
-            keyword.lower() in text
-            for keyword in keywords
+            keyword.lower()
+            in text
+            for keyword
+            in keywords
         ):
             countries.append(
                 country
@@ -750,12 +923,19 @@ def detect_countries(
 
 
 def enrich_articles(
-    articles: list[dict[str, str]],
-) -> list[dict[str, object]]:
+    articles: list[
+        dict[str, str]
+    ],
+) -> list[
+    dict[str, object]
+]:
 
     enriched = []
 
-    for index, article in enumerate(
+    for (
+        index,
+        article,
+    ) in enumerate(
         articles,
         start=1,
     ):
@@ -774,9 +954,13 @@ def enrich_articles(
         )
 
         summary = summarize_text(
-            title=article["title"],
+            title=article[
+                "title"
+            ],
             text=article_text,
-            fallback=article["description"],
+            fallback=article[
+                "description"
+            ],
             sentence_count=3,
         )
 
@@ -826,8 +1010,12 @@ def enrich_articles(
 
 
 def count_keywords(
-    articles: list[dict[str, object]],
-) -> list[tuple[str, int]]:
+    articles: list[
+        dict[str, object]
+    ],
+) -> list[
+    tuple[str, int]
+]:
 
     counts = Counter()
 
@@ -839,7 +1027,10 @@ def count_keywords(
         ).lower()
 
         for keyword in KEYWORD_CANDIDATES:
-            if keyword.lower() in text:
+            if (
+                keyword.lower()
+                in text
+            ):
                 counts[
                     keyword
                 ] += 1
@@ -850,7 +1041,10 @@ def count_keywords(
 
 
 def render_article_card(
-    article: dict[str, object],
+    article: dict[
+        str,
+        object,
+    ],
 ) -> str:
 
     title = html.escape(
@@ -872,11 +1066,13 @@ def render_article_card(
         )
     )
 
-    published = format_published_date(
-        str(
-            article.get(
-                "published",
-                "",
+    published = html.escape(
+        format_published_date(
+            str(
+                article.get(
+                    "published",
+                    "",
+                )
             )
         )
     )
@@ -888,14 +1084,17 @@ def render_article_card(
 
     summary_html = ""
 
-    if isinstance(
-        summary,
-        list,
-    ) and summary:
-
+    if (
+        isinstance(
+            summary,
+            list,
+        )
+        and summary
+    ):
         items = "".join(
             f"<li>{html.escape(str(item))}</li>"
-            for item in summary
+            for item
+            in summary
         )
 
         summary_html = (
@@ -927,13 +1126,15 @@ def render_article_card(
 
 
 def render_category_sections(
-    articles: list[dict[str, object]],
+    articles: list[
+        dict[str, object]
+    ],
 ) -> str:
 
     categories = [
-        "정책·ODA",
-        "NGO·시민사회",
         "해외봉사",
+        "NGO·시민사회",
+        "정책·ODA",
         "인도적 지원",
     ]
 
@@ -943,8 +1144,14 @@ def render_category_sections(
 
         category_articles = [
             article
-            for article in articles
-            if article["category"] == category
+            for article
+            in articles
+            if (
+                article[
+                    "category"
+                ]
+                == category
+            )
         ][
             :MAX_ARTICLES_PER_SECTION
         ]
@@ -974,13 +1181,18 @@ def render_category_sections(
             for article in category_articles:
                 grouped[
                     str(
-                        article["organization"]
+                        article[
+                            "organization"
+                        ]
                     )
                 ].append(
                     article
                 )
 
-            for organization, org_articles in grouped.items():
+            for (
+                organization,
+                org_articles,
+            ) in grouped.items():
 
                 output.append(
                     f"""
@@ -1007,7 +1219,9 @@ def render_category_sections(
 
 
 def render_country_section(
-    articles: list[dict[str, object]],
+    articles: list[
+        dict[str, object]
+    ],
 ) -> str:
 
     country_articles = defaultdict(
@@ -1015,7 +1229,6 @@ def render_country_section(
     )
 
     for article in articles:
-
         countries = article.get(
             "countries",
             [],
@@ -1046,14 +1259,19 @@ def render_country_section(
     sorted_countries = sorted(
         country_articles.items(),
         key=lambda item: (
-            -len(item[1]),
+            -len(
+                item[1]
+            ),
             item[0],
         ),
     )[
         :12
     ]
 
-    for country, country_news in sorted_countries:
+    for (
+        country,
+        country_news,
+    ) in sorted_countries:
 
         flag = COUNTRY_FLAGS.get(
             country,
@@ -1066,26 +1284,45 @@ def render_country_section(
 
             title = html.escape(
                 str(
-                    article["title"]
+                    article[
+                        "title"
+                    ]
                 )
             )
 
             link = html.escape(
                 str(
-                    article["link"]
+                    article[
+                        "link"
+                    ]
                 ),
                 quote=True,
             )
 
             source = html.escape(
                 str(
-                    article["source"]
+                    article[
+                        "source"
+                    ]
                 )
             )
 
             category = html.escape(
                 str(
-                    article["category"]
+                    article[
+                        "category"
+                    ]
+                )
+            )
+
+            published = html.escape(
+                format_published_date(
+                    str(
+                        article.get(
+                            "published",
+                            "",
+                        )
+                    )
                 )
             )
 
@@ -1102,7 +1339,7 @@ def render_country_section(
     </a>
 
     <div class="country-article-meta">
-        {source} · {category}
+        {source} · {published} · {category}
     </div>
 
 </li>
@@ -1139,7 +1376,9 @@ def render_country_section(
 
 
 def render_keyword_section(
-    articles: list[dict[str, object]],
+    articles: list[
+        dict[str, object]
+    ],
 ) -> str:
 
     keyword_counts = count_keywords(
@@ -1162,16 +1401,12 @@ def render_keyword_section(
     </small>
 </span>
 """
-        for keyword, count
-        in keyword_counts
+        for (
+            keyword,
+            count,
+        ) in keyword_counts
     )
 
-
-# =========================================================
-# 중요:
-# CSS가 포함된 부분은 f-string이 아닙니다.
-# 따라서 CSS의 { }를 {{ }}로 바꿀 필요가 없습니다.
-# =========================================================
 
 HTML_HEAD = """<!DOCTYPE html>
 
@@ -1190,28 +1425,20 @@ HTML_HEAD = """<!DOCTYPE html>
         한국 국제개발협력 Daily Brief
     </title>
 
-
     <style>
 
         * {
             box-sizing: border-box;
         }
 
-
         html {
             scroll-behavior: smooth;
         }
 
-
         body {
-
             margin: 0;
-
-            background:
-                #ffffff;
-
-            color:
-                #222222;
+            background: #ffffff;
+            color: #222222;
 
             font-family:
                 Pretendard,
@@ -1220,462 +1447,223 @@ HTML_HEAD = """<!DOCTYPE html>
                 Arial,
                 sans-serif;
 
-            line-height:
-                1.75;
-
-            word-break:
-                keep-all;
+            line-height: 1.75;
+            word-break: keep-all;
         }
-
 
         .container {
-
-            width:
-                100%;
-
-            max-width:
-                1180px;
-
-            margin:
-                0 auto;
-
-            padding:
-                48px 24px 80px;
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
         }
-
 
         h1 {
-
-            margin:
-                0 0 6px;
-
-            font-size:
-                34px;
-
-            line-height:
-                1.35;
+            margin: 0 0 6px;
+            font-size: 34px;
+            line-height: 1.35;
         }
-
 
         .date {
-
-            color:
-                #666666;
-
-            margin-bottom:
-                32px;
+            color: #666666;
+            margin-bottom: 32px;
         }
-
 
         .divider {
-
-            margin:
-                32px 0;
-
-            border:
-                0;
-
-            border-top:
-                1px solid #bfc5cc;
+            margin: 32px 0;
+            border: 0;
+            border-top: 1px solid #bfc5cc;
         }
-
 
         .summary {
-
-            padding:
-                22px 24px;
-
-            background:
-                #f7f8fa;
-
-            border-left:
-                5px solid #2457a6;
+            padding: 22px 24px;
+            background: #f7f8fa;
+            border-left: 5px solid #2457a6;
         }
-
 
         .summary h2 {
-
-            margin-top:
-                0;
-
-            font-size:
-                22px;
+            margin-top: 0;
+            font-size: 22px;
         }
-
 
         .summary ul {
-
-            margin-bottom:
-                0;
+            margin-bottom: 0;
         }
-
 
         .summary li {
-
-            margin-bottom:
-                6px;
+            margin-bottom: 6px;
         }
-
 
         .brief-section {
-
-            width:
-                100%;
-
-            padding:
-                30px 0;
-
-            border-bottom:
-                1px solid #dddddd;
+            width: 100%;
+            padding: 30px 0;
+            border-bottom: 1px solid #dddddd;
         }
-
 
         .brief-section h2 {
-
-            margin:
-                0 0 22px;
-
-            color:
-                #173f73;
-
-            font-size:
-                23px;
+            margin: 0 0 22px;
+            color: #173f73;
+            font-size: 23px;
         }
-
 
         .brief-section h3 {
-
-            margin:
-                28px 0 12px;
-
-            font-size:
-                19px;
+            margin: 28px 0 12px;
+            font-size: 19px;
         }
-
 
         .news-summary {
-
-            width:
-                100%;
-
-            margin-bottom:
-                24px;
-
-            padding:
-                18px 20px;
-
-            background:
-                #fafafa;
-
-            border:
-                1px solid #e0e3e7;
+            width: 100%;
+            margin-bottom: 24px;
+            padding: 18px 20px;
+            background: #fafafa;
+            border: 1px solid #e0e3e7;
         }
-
 
         .news-summary h4 {
-
-            width:
-                100%;
-
-            margin:
-                0 0 12px;
-
-            font-size:
-                17px;
-
-            line-height:
-                1.55;
-
-            overflow-wrap:
-                anywhere;
-
-            word-break:
-                break-word;
+            width: 100%;
+            margin: 0 0 12px;
+            font-size: 17px;
+            line-height: 1.55;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
-
 
         .article-title-link {
-
-            color:
-                #222222;
-
-            text-decoration:
-                none;
-
-            font-weight:
-                700;
+            color: #222222;
+            text-decoration: none;
+            font-weight: 700;
         }
-
 
         .article-title-link:hover {
-
-            color:
-                #1456a0;
-
-            text-decoration:
-                underline;
+            color: #1456a0;
+            text-decoration: underline;
         }
-
 
         .news-summary ul {
-
-            width:
-                100%;
-
-            margin:
-                0;
-
-            padding-left:
-                22px;
+            width: 100%;
+            margin: 0;
+            padding-left: 22px;
         }
-
 
         .news-summary li {
-
-            margin-bottom:
-                9px;
-
-            line-height:
-                1.8;
-
-            overflow-wrap:
-                anywhere;
-
-            word-break:
-                break-word;
+            margin-bottom: 9px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
-
 
         .summary-source {
-
-            margin-top:
-                12px;
-
-            color:
-                #777777;
-
-            font-size:
-                13px;
+            margin-top: 12px;
+            color: #777777;
+            font-size: 13px;
         }
-
 
         .country-grid {
-
-            display:
-                grid;
-
-            grid-template-columns:
-                1fr;
-
-            gap:
-                10px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
         }
-
 
         .country-item {
-
-            width:
-                100%;
-
-            background:
-                #f7f8fa;
-
-            border:
-                1px solid #e0e3e7;
+            width: 100%;
+            background: #f7f8fa;
+            border: 1px solid #e0e3e7;
         }
 
-
         .country-item summary {
-
-            display:
-                grid;
-
+            display: grid;
             grid-template-columns:
                 1fr auto auto;
 
-            align-items:
-                center;
-
-            gap:
-                12px;
-
-            width:
-                100%;
-
-            padding:
-                13px 15px;
-
-            cursor:
-                pointer;
-
-            font-weight:
-                600;
-
-            list-style:
-                none;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 13px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            list-style: none;
         }
-
 
         .country-item summary::-webkit-details-marker {
             display: none;
         }
 
-
         .country-item summary::after {
-
-            content:
-                "＋";
-
-            color:
-                #2457a6;
-
-            font-size:
-                18px;
+            content: "＋";
+            color: #2457a6;
+            font-size: 18px;
         }
-
 
         .country-item[open] summary::after {
             content: "−";
         }
 
-
         .country-item[open] summary {
             background: #eef3f8;
         }
 
-
         .country-article-list {
-
-            width:
-                100%;
-
-            margin:
-                0;
-
-            padding:
-                16px 24px 18px 44px;
-
-            background:
-                #ffffff;
-
-            border-top:
-                1px solid #e0e3e7;
+            width: 100%;
+            margin: 0;
+            padding: 16px 24px 18px 44px;
+            background: #ffffff;
+            border-top: 1px solid #e0e3e7;
         }
-
 
         .country-article-list li {
-
-            margin-bottom:
-                15px;
-
-            overflow-wrap:
-                anywhere;
-
-            word-break:
-                break-word;
+            margin-bottom: 15px;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
-
 
         .country-article-list a {
-
-            color:
-                #1456a0;
-
-            font-weight:
-                600;
-
-            text-decoration:
-                none;
+            color: #1456a0;
+            font-weight: 600;
+            text-decoration: none;
         }
-
 
         .country-article-list a:hover {
             text-decoration: underline;
         }
 
-
         .country-article-meta {
-
-            margin-top:
-                3px;
-
-            color:
-                #777777;
-
-            font-size:
-                13px;
+            margin-top: 3px;
+            color: #777777;
+            font-size: 13px;
         }
-
 
         .keywords {
-
-            display:
-                flex;
-
-            flex-wrap:
-                wrap;
-
-            gap:
-                10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
 
         .keyword {
-
-            display:
-                inline-flex;
-
-            align-items:
-                center;
-
-            gap:
-                7px;
-
-            padding:
-                7px 11px;
-
-            background:
-                #eef3f8;
-
-            border-radius:
-                20px;
-
-            color:
-                #173f73;
-
-            font-weight:
-                600;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            background: #eef3f8;
+            border-radius: 20px;
+            color: #173f73;
+            font-weight: 600;
         }
-
 
         .keyword small {
             color: #777777;
         }
 
-
         .empty {
             color: #777777;
         }
 
-
         .notice {
-
-            margin-top:
-                35px;
-
-            padding-top:
-                18px;
-
-            border-top:
-                1px solid #dddddd;
-
-            color:
-                #777777;
-
-            font-size:
-                13px;
+            margin-top: 35px;
+            padding-top: 18px;
+            border-top: 1px solid #dddddd;
+            color: #777777;
+            font-size: 13px;
         }
-
 
         @media (max-width: 640px) {
 
@@ -1683,36 +1671,32 @@ HTML_HEAD = """<!DOCTYPE html>
                 padding: 28px 16px 60px;
             }
 
-
             h1 {
                 font-size: 27px;
             }
-
 
             .summary {
                 padding: 18px;
             }
 
-
             .news-summary {
                 padding: 15px;
             }
-
 
             .country-item summary {
                 padding: 12px;
             }
 
-
             .country-article-list {
-                padding: 14px 18px 16px 34px;
+                padding:
+                    14px 18px
+                    16px 34px;
             }
         }
 
     </style>
 
 </head>
-
 
 <body>
 
@@ -1731,7 +1715,9 @@ HTML_FOOT = """
 
 
 def create_html(
-    articles: list[dict[str, object]],
+    articles: list[
+        dict[str, object]
+    ],
 ) -> str:
 
     now = datetime.now(
@@ -1740,29 +1726,39 @@ def create_html(
 
     category_counts = Counter(
         str(
-            article["category"]
+            article[
+                "category"
+            ]
         )
-        for article in articles
+        for article
+        in articles
     )
 
     extracted_count = sum(
         1
-        for article in articles
+        for article
+        in articles
         if article.get(
             "article_text"
         )
     )
 
-    category_sections = render_category_sections(
-        articles
+    category_sections = (
+        render_category_sections(
+            articles
+        )
     )
 
-    country_section = render_country_section(
-        articles
+    country_section = (
+        render_country_section(
+            articles
+        )
     )
 
-    keyword_section = render_keyword_section(
-        articles
+    keyword_section = (
+        render_keyword_section(
+            articles
+        )
     )
 
     body = f"""
@@ -1779,9 +1775,7 @@ def create_html(
 
 </header>
 
-
 <hr class="divider">
-
 
 <section class="summary">
 
@@ -1806,23 +1800,23 @@ def create_html(
         </li>
 
         <li>
-            정책·ODA 관련
+            해외봉사 관련
             <strong>
-                {category_counts.get("정책·ODA", 0)}건
+                {category_counts.get("해외봉사", 0)}건
             </strong>
         </li>
 
         <li>
-            NGO 관련
+            NGO·시민사회 관련
             <strong>
                 {category_counts.get("NGO·시민사회", 0)}건
             </strong>
         </li>
 
         <li>
-            해외봉사 관련
+            정책·ODA 관련
             <strong>
-                {category_counts.get("해외봉사", 0)}건
+                {category_counts.get("정책·ODA", 0)}건
             </strong>
         </li>
 
@@ -1837,12 +1831,9 @@ def create_html(
 
 </section>
 
-
 <hr class="divider">
 
-
 {category_sections}
-
 
 <section class="brief-section">
 
@@ -1862,7 +1853,6 @@ def create_html(
 
 </section>
 
-
 <section class="brief-section">
 
     <h2>
@@ -1877,7 +1867,6 @@ def create_html(
 
 </section>
 
-
 <div class="notice">
 
     본 브리핑은 Google News RSS 검색 결과와
@@ -1890,7 +1879,6 @@ def create_html(
 </div>
 """
 
-    # 별도 원문기사 목록은 생성하지 않음
     return (
         HTML_HEAD
         + body
@@ -1899,7 +1887,9 @@ def create_html(
 
 
 def create_readme(
-    articles: list[dict[str, object]],
+    articles: list[
+        dict[str, object]
+    ],
 ) -> str:
 
     now = datetime.now(
@@ -1912,9 +1902,11 @@ def create_readme(
         "한국 국제개발협력, ODA, NGO, 해외봉사 및 "
         "인도적 지원 관련 최신 뉴스를 자동으로 수집합니다.",
         "",
-        f"> 최근 업데이트: **{now:%Y-%m-%d %H:%M} KST**",
+        f"> 최근 업데이트: "
+        f"**{now:%Y-%m-%d %H:%M} KST**",
         "",
-        f"총 수집 기사: **{len(articles)}건**",
+        f"총 수집 기사: "
+        f"**{len(articles)}건**",
         "",
         "GitHub Pages의 기사 제목을 클릭하면 "
         "해당 기사로 이동합니다.",
@@ -1945,8 +1937,10 @@ def main() -> None:
             "RSS 검색 결과를 확인하세요."
         )
 
-    enriched_articles = enrich_articles(
-        articles
+    enriched_articles = (
+        enrich_articles(
+            articles
+        )
     )
 
     print(
@@ -1957,8 +1951,10 @@ def main() -> None:
         enriched_articles
     )
 
-    readme_content = create_readme(
-        enriched_articles
+    readme_content = (
+        create_readme(
+            enriched_articles
+        )
     )
 
     with open(
