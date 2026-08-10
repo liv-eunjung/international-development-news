@@ -263,43 +263,46 @@ def google_news_rss_url(keyword: str) -> str:
 
 
 def clean_text(value: str) -> str:
-    value = html.unescape(value or "")
+def format_published_date(published: str) -> str:
+    """Google News RSS 게시일을 YYYY.MM.DD 형식으로 변환합니다."""
 
-    value = re.sub(
-        r"<[^>]+>",
-        " ",
-        value,
-    )
+    if not published:
+        return "게시일 미확인"
 
-    value = (
-        value.replace("\n", " ")
-        .replace("\r", " ")
-        .replace("\xa0", " ")
-    )
+    try:
+        parsed = datetime.strptime(
+            published,
+            "%a, %d %b %Y %H:%M:%S %Z",
+        )
 
-    return re.sub(
-        r"\s+",
-        " ",
-        value,
-    ).strip()
+        parsed = parsed.replace(
+            tzinfo=timezone.utc
+        ).astimezone(KST)
 
+        return parsed.strftime(
+            "%Y.%m.%d"
+        )
 
-def normalize_title(title: str) -> str:
-    normalized = title.lower()
+    except ValueError:
+        pass
 
-    normalized = re.sub(
-        r"\s*-\s*[^-]+$",
-        "",
-        normalized,
-    )
+    # 일부 RSS에서 timezone 표기가 다른 경우 대비
+    try:
+        parsed = datetime.strptime(
+            published,
+            "%a, %d %b %Y %H:%M:%S %z",
+        )
 
-    normalized = re.sub(
-        r"[^가-힣a-z0-9]",
-        "",
-        normalized,
-    )
+        parsed = parsed.astimezone(
+            KST
+        )
 
-    return normalized
+        return parsed.strftime(
+            "%Y.%m.%d"
+        )
+
+    except ValueError:
+        return "게시일 미확인"
 
 
 def collect_news() -> list[dict[str, str]]:
